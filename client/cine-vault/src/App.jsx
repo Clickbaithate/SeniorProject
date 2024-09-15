@@ -3,10 +3,12 @@ import supabase from './config/supabaseClient';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import SignUpPage from './pages/SignUpPage';
 import LandingPage from './pages/LandingPage';
-import HomePage from './pages/homePage';
+import HomePage from './pages/HomePage';
+import Sidebar from './pages/Sidebar.jsx';
 import ProfileSetup from './pages/profileSetup';
 import EmailConfirmationPage from './pages/EmailConfirmationPage';
 import LoginPage from './pages/LoginPage';
+import DiscoverPage from './pages/DiscoverPage'; 
 
 function App() {
 
@@ -51,6 +53,8 @@ function App() {
         <Route path="/homePage" element={session ? <HomePage /> : <Navigate to="/" />} />
         <Route path="/profileSetup" element={session ? <ProfileSetup /> : <Navigate to="/" />} />
         <Route path="/emailConfirmationPage" element={<EmailConfirmationPage />} />
+
+        <Route path="/discover" element={session ? <DiscoverPage /> : <Navigate to="/" />} />
 
         <Route path="*" element={session ? <Navigate to="/homePage" /> : <Navigate to="/" />} />
       </Routes>

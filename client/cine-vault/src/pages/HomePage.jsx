@@ -1,6 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import supabase from '../config/supabaseClient';
 import { Link } from 'react-router-dom';
+import Sidebar from './Sidebar';
+
 
 const HomePage = () => {
 
@@ -75,6 +77,7 @@ const HomePage = () => {
 
   return (
     <div className="min-h-screen bg-gray-100 flex flex-col items-center p-6">
+      <Sidebar />
       <div className="w-full max-w-3xl bg-white shadow-md rounded-lg p-6 mb-6">
         <h1 className="text-4xl font-bold mb-4">Welcome to the Movie Tracker App!</h1>
         {user && (
