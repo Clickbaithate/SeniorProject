@@ -3,21 +3,18 @@ import { useNavigate } from 'react-router-dom';
 import { useState } from 'react';
 
 const EmailConfirmationPage = () => {
-
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState(null);
   const [message, setMessage] = useState('');
   const navigate = useNavigate();
 
-  // If user has confirmed their email then they log in, user should be taken to customize their profile
-  // This might change so user doesnt have to input their email and password again
   const handleLogin = async (e) => {
     e.preventDefault();
     try {
       const { data, error } = await supabase.auth.signInWithPassword({
         email,
-        password
+        password,
       });
 
       if (error) {
@@ -26,9 +23,9 @@ const EmailConfirmationPage = () => {
       }
 
       if (data.session?.user?.email_confirmed_at) {
-        setMessage("Success!");
+        setMessage('Success!');
         setTimeout(() => {
-          navigate('/profileSetup'); 
+          navigate('/profileSetup');
         }, 1000);
       } else {
         setError('Email not confirmed yet. Please check your email for the confirmation link.');
@@ -39,54 +36,43 @@ const EmailConfirmationPage = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-100 flex flex-col items-center justify-center p-6">
+    <div className="min-h-screen relative flex flex-col items-center bg-gray-100 font-body">
+      
+      <div className="absolute inset-0 z-0">
+        <div className="bg-blue-500 h-1/2 w-full"></div>
+        <div className="bg-gray-100 h-1/2 w-full"></div>
+      </div>
 
-      <h1 className="text-2xl font-bold mb-4">Email Confirmation</h1>
-      <p className="text-md">Almost there! We've sent a confirmation email. </p> 
-      <p className="text-md mb-4">Once you've confirmed your email, please log in to get started.</p>
+      <header className="absolute top-0 left-24 z-10 p-5">
+        <div className="flex items-center space-x-6">
+          <div className="bg-[url('assets/logo.svg')] bg-contain w-32 h-32"></div>
+          <h1 className="text-3xl font-bold text-black">CineVault</h1>
+        </div>
+      </header>
 
-      <form onSubmit={handleLogin} className="space-y-4">
-        {/* Email textbox */}
-        <div className="flex flex-col">
-          <label htmlFor="email" className="text-gray-700 mb-1">Email:</label>
-          <input
-            id="email"
-            type="email"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            placeholder="Email"
-            required
-            className="p-2 border border-gray-300 rounded"
-          />
+      <div className="relative z-10 w-auto bg-gray-100 p-8 rounded-lg shadow-lg flex flex-col items-center max-w-2xl mx-auto mt-72 shadow-black border-2 border-black">
+
+        <div className="rounded-full">
+          <div className="bg-[url('assets/email.svg')] bg-contain w-24 h-24"></div>
         </div>
-        {/* Password textbox */}
-        <div className="flex flex-col">
-          <label htmlFor="password" className="text-gray-700 mb-1">Password:</label>
-          <input
-            id="password"
-            type="password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            placeholder="Password"
-            required
-            className="p-2 border border-gray-300 rounded"
-          />
-        </div>
-        {/* Login Button */}
-        <button
-          type="submit"
-          className="w-full bg-blue-500 text-white py-2 rounded hover:bg-blue-600"
-        >
-          Login
+
+        <h1 className="text-2xl mt-4">Verify your email address</h1>
+        <p className="text-center text-gray-600 mt-2 py-6">
+          We've sent you an email that contains a link to complete your registration. Please check
+          your spam inbox if you can't find the mail. If you still can't find it, we can resend it.
+        </p>
+
+        <button className="bg-blue-500 text-white px-6 py-2 rounded-lg mt-4 hover:bg-blue-600">
+          Resend Email
         </button>
-      </form>
 
-      <p className="mt-4 text-center text-blue-500 hover:underline">
-        <a href="/signup">Don't have an account? Sign up here.</a>
-      </p>
+        <a href="/login" className="mt-4 text-black-500 hover:underline">
+          &lt; Back To Login
+        </a>
 
-      {error && <p className="mt-4 text-center text-red-500">{error}</p>}
-      {message && <p className="mt-4 text-center text-green-500">{message}</p>}
+        {error && <p className="mt-4 text-red-500">{error}</p>}
+        {message && <p className="mt-4 text-green-500">{message}</p>}
+      </div>
     </div>
   );
 };
