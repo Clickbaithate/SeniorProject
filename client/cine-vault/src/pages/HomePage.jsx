@@ -93,7 +93,8 @@ const HomePage = () => {
             </div>
           </div>
         )}
-        <Link to="/profileSetup" className="text-blue-500 hover:underline text-lg mb-4">
+        {/* Uncomment below for testing purposes if needed */}
+        {/* <Link to="/profileSetup" className="text-blue-500 hover:underline text-lg mb-4">
           Edit your profile!
         </Link>
         <button
@@ -101,7 +102,7 @@ const HomePage = () => {
           className="bg-red-500 text-white py-2 px-4 rounded-lg hover:bg-red-600"
         >
           Log Out
-        </button>
+        </button> */}
       </div>
 
       <div className="w-full max-w-3xl">
