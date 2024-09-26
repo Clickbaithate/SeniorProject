@@ -28,7 +28,11 @@ const Sidebar = () => {
           <li><FontAwesomeIcon icon={faFolder} /></li>
           <li><FontAwesomeIcon icon={faUserGroup} /></li>
           <li><FontAwesomeIcon icon={faAward} /></li>
-          <li><FontAwesomeIcon icon={faGear} /></li>
+          <li>
+            <NavLink to="/settings" activeClassName="active-link">
+            <FontAwesomeIcon icon={faGear} />
+            </NavLink>
+          </li>
           <li><FontAwesomeIcon icon={faArrowRightFromBracket} /></li>
         </ul>
       </nav>
