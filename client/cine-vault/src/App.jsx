@@ -9,6 +9,7 @@ import ProfileSetup from './pages/profileSetup';
 import EmailConfirmationPage from './pages/EmailConfirmationPage';
 import LoginPage from './pages/LoginPage';
 import DiscoverPage from './pages/DiscoverPage'; 
+import SettingsPage from './pages/SettingsPage.jsx';
 
 function App() {
 
@@ -55,6 +56,7 @@ function App() {
         <Route path="/emailConfirmationPage" element={<EmailConfirmationPage />} />
 
         <Route path="/discover" element={session ? <DiscoverPage /> : <Navigate to="/" />} />
+        <Route path="/settings" element={session ? <SettingsPage /> : <Navigate to="/" />} />
 
         <Route path="*" element={session ? <Navigate to="/homePage" /> : <Navigate to="/" />} />
       </Routes>

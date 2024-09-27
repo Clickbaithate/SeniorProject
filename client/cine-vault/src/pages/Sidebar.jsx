@@ -57,7 +57,11 @@ const Sidebar = () => {
               <li><FontAwesomeIcon icon={faFolder} /></li>
               <li><FontAwesomeIcon icon={faUserGroup} /></li>
               <li><FontAwesomeIcon icon={faAward} /></li>
-              <li><FontAwesomeIcon icon={faGear} /></li>
+              <li>
+                <NavLink to="/settings" activeClassName="active-link">
+                  <FontAwesomeIcon icon={faGear} />
+                </NavLink>
+              </li>
               <li>
                 <button onClick={handleLogoutClick} className="logout-icon">
                   <FontAwesomeIcon icon={faArrowRightFromBracket} />
@@ -68,32 +72,30 @@ const Sidebar = () => {
           <div className="sidebar-footer"></div>
         </div>
 
-        
-      </div>
-    
-      {/* Modal for confirming logout */}
-      {isModalOpen && (
-        <div className="modal-overlay">
-          <div className="modal-box">
-            <h2 className="modal-title">Confirm Logout</h2>
-            <p className="modal-text">Are you sure you want to log out?</p>
-            <div className="button-container">
-              <button 
-                onClick={handleCloseModal} 
-                className="modal-button cancel-button"
-              >
-                Cancel
-              </button>
-              <button 
-                onClick={handleConfirmLogout} 
-                className="modal-button logout-button"
-              >
-                Logout
-              </button>
+        {/* Modal for confirming logout */}
+        {isModalOpen && (
+          <div className="modal-overlay">
+            <div className="modal-box">
+              <h2 className="modal-title">Confirm Logout</h2>
+              <p className="modal-text">Are you sure you want to log out?</p>
+              <div className="button-container">
+                <button 
+                  onClick={handleCloseModal} 
+                  className="modal-button cancel-button"
+                >
+                  Cancel
+                </button>
+                <button 
+                  onClick={handleConfirmLogout} 
+                  className="modal-button logout-button"
+                >
+                  Logout
+                </button>
+              </div>
             </div>
           </div>
-        </div>
-      )}
+        )}
+      </div>
     </div>
   );
 };
