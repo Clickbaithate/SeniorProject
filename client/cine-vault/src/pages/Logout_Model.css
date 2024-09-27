@@ -19,7 +19,7 @@
   width: 380px;
   text-align: center;
 }
-
+/* Comment */
 /* Modal title */
 .modal-title {
   font-size: 24px;
@@ -66,4 +66,7 @@
 .logout-button {
   color: #fff;
   background-color: #0376F2;
+}
+.something{
+  color: blanchedalmond;
 }
