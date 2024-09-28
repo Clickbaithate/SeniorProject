@@ -40,7 +40,7 @@ const DiscoverPage = () => {
                 const { data, error } = await supabase
                     .from('Movies')
                     .select('movie_id, title, image, genres')
-                    .limit(1000);
+                    .limit(100);
 
                 if (error) {
                     console.error('Error fetching movies:', error);
@@ -114,24 +114,6 @@ const DiscoverPage = () => {
                         <p>No movies available.</p>
                     )}
                 </div>
-
-                    <div className="movie-list">
-                        {filteredMovies.length > 0 ? (
-                            filteredMovies.map((movie)=>(
-                                <div key={movie.movie_id} className="movie-item">
-                                    <img
-                                        src={movie.image || 'https://via.placeholder.com/150'}
-                                        alt={movie.title}
-                                        className="w-full h-40 object-cover mb-2"
-                                    />
-                                    <h3 className="text-lg font-semibold">{movie.title}</h3>
-                                </div>
-                            ))
-                            ):(
-                                <p>No movies available.</p>
-                        )}
-                    </div>
-
             </div>
         </div>
     );

@@ -168,3 +168,16 @@
     font-size: 25px;
     padding-left: 20px;
 }
+
+.saveprofile{
+    background-color: aqua;
+}
+.move{
+    top: 165px;
+}
+
+.what-theme{
+    padding-top: 5px;
+    padding-left: 5px;
+
+}

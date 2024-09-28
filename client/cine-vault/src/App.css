@@ -1,0 +1,138 @@
+/* light mode */
+:root {
+    --sidebar-bg-color: #e0e0e0;
+    --text-color: #000000;
+    --input-bg-color: #e0e0e0;
+    --settings-input-bg-color: #e0e0e0;
+    --hover-bg-color: #cccccc;
+    --button-bg-color: #6200ee;
+    --content-area-bg-color: #f3f3f3fb;
+    --title-color: #000000; 
+    --saveprofile-bg-color: #E4E4E4;
+    --genre-button-bg-color: #e0e0e0;
+    --movie-item-bg-color: #f3f3f3fb;
+    --section-title-text-color: #000000;
+    --search-bar-bg-color: #e0e0e0; 
+    --search-icon-color: #676873;
+    --search-input-text-color: #000000;
+    --search-input-placeholder-color: #676873; 
+    --cancel-button-bg-color: #E4E4E4;
+    --cancel-button-outline: #000000;
+    --logout-button-bg-color: #0376F2;
+    --modal-box-bg-color: #E4E4E4;
+}
+/* dark mode */
+
+[data-theme='dark'] {
+    --movie-item-bg-color: #2b2b2b;
+    --section-title-color: #000000;
+    --genre-button-bg-color: #25262F;
+    --sidebar-bg-color: #25262F;
+    --text-color: #ffffff;
+    --settings-input-bg-color: #333;
+    --hover-bg-color: #28293E;
+    --button-bg-color: #3700b3;
+    --content-area-bg-color: #2b2b2b;
+    --title-color: #ffffff;
+    --saveprofile-bg-color: #3700b3;
+    --search-bar-bg-color: #25262F;
+    --search-icon-color: #676873;
+    --search-input-text-color: #ffffff; 
+    --search-input-placeholder-color: #676873; 
+    --cancel-button-bg-color: #25262F;
+    --cancel-button-outline: #FFFFFF;
+    --logout-button-bg-color: #0376F2;
+    --modal-box-bg-color: #25262F;
+}
+
+/* Apply variables */
+body {
+    background-color: var(--background-color);
+    color: var(--text-color);
+    transition: background-color 0.3s, color 0.3s;
+}
+
+.sidebar {
+    background-color: var(--sidebar-bg-color);
+    color: var(--text-color);
+}
+
+.content-area {
+    background-color: var(--content-area-bg-color);
+    color: var(--text-color);
+    transition: background-color 0.3s, color 0.3s;
+}
+
+.saveprofile{
+    background-color: var(--saveprofile-bg-color);
+    transition: background-color 0.3s, color 0.3s;
+}
+
+
+
+.settings-input{
+    background-color: var(--settings-input-bg-color);
+    color: var(--text-color);
+    border: 1px solid var(--hover-bg-color);
+    transition: background-color 0.3s, color 0.3s;
+}
+
+
+.sidebar-nav ul li:hover {
+    background-color: var(--hover-bg-color);
+}
+
+.genre-button{
+    background-color: var(--genre-button-bg-color);
+    color: var(--text-color);
+    transition: background-color 0.3s, color 0.3s;
+}
+.movie-item{
+    background-color: var(--movie-item-bg-color);
+    color: var(--text-color);
+    transition: background-color 0.3s, color 0.3s;
+}
+
+.section-title{
+    color: var(--text-color);
+}
+
+.search-bar {
+    background-color: var(--search-bar-bg-color);
+  }
+  
+  .search-icon {
+    color: var(--search-icon-color);
+  }
+  
+  .search-input {
+    color: var(--search-input-text-color);
+  }
+  
+  .search-input::placeholder {
+    color: var(--search-input-placeholder-color);
+  }
+
+.cancel-button {
+    background-color:var(--cancel-button-bg-color);
+    color: var(--text-color);
+    outline: 1px solid var(--cancel-button-outline);
+  }
+
+  .logout-button {
+    color: var(--text-color);
+    background-color: var(--logout-button-bg-color);
+  }
+
+  .modal-box {
+    color: var(--text-color);
+    background-color: var(--modal-box-bg-color);
+  }
+
+  .modal-title {
+    color: var(--text-color);
+  }
+  
+  .modal-text {
+    color: var(--text-color);
+  }
