@@ -76,9 +76,9 @@ const HomePage = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-100 flex flex-col items-center p-6">
+    <div className="min-h-screen bg-gray-900 flex flex-col items-center p-6">
       <Sidebar />
-      <div className="w-full max-w-3xl bg-white shadow-md rounded-lg p-6 mb-6">
+      <div className="w-full max-w-3xl bg-gray-900 shadow-md rounded-lg p-6 mb-6">
         <h1 className="text-4xl font-bold mb-4">Welcome to the Movie Tracker App!</h1>
         {user && (
           <div className="flex items-center mb-6">
@@ -110,7 +110,7 @@ const HomePage = () => {
         {movies.length > 0 ? (
           <div className="flex overflow-x-scroll space-x-4">
             {movies.map(movie => (
-              <div key={movie.movie_id} className="bg-white shadow-md rounded-lg p-4 flex-shrink-0 w-40">
+              <div key={movie.movie_id} className="bg-gray-900 shadow-md rounded-lg p-4 flex-shrink-0 w-40">
                 <img
                   src={movie.image || 'https://via.placeholder.com/150'}
                   alt={movie.title}
