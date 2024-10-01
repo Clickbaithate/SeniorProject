@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import './Sidebar.css'; // Import your existing sidebar styles
 import './Logout_Model.css'; // Import the new modal CSS file
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faHouse, faCompass, faGlasses, faFolder, faUserGroup, faAward, faGear, faArrowRightFromBracket } from "@fortawesome/free-solid-svg-icons";
+import { faHouse, faCompass, faGlasses, faFolder, faUserGroup, faAward, faGear, faArrowRightFromBracket, faUser } from "@fortawesome/free-solid-svg-icons";
 import { NavLink } from 'react-router-dom';
 import supabase from '../config/supabaseClient';
 
@@ -44,21 +44,25 @@ const Sidebar = () => {
           <nav className="sidebar-nav">
             <ul>
               <li>
-                <NavLink exact to="/homePage" activeClassName="active-link">
+                <NavLink to="/homePage" className="active-link">
                   <FontAwesomeIcon icon={faHouse} />
                 </NavLink>
               </li>
               <li>
-                <NavLink to="/discover" activeClassName="active-link">
+                <NavLink to="/discover" className="active-link">
                   <FontAwesomeIcon icon={faCompass} />
                 </NavLink>
               </li>
               <li><FontAwesomeIcon icon={faGlasses} /></li>
               <li><FontAwesomeIcon icon={faFolder} /></li>
-              <li><FontAwesomeIcon icon={faUserGroup} /></li>
+              <li>
+                <NavLink to="/friendsPage" className="active-link">
+                  <FontAwesomeIcon icon={faUserGroup} />
+                </NavLink>
+              </li>
               <li><FontAwesomeIcon icon={faAward} /></li>
               <li>
-                <NavLink to="/settings" activeClassName="active-link">
+                <NavLink to="/settings" className="active-link">
                   <FontAwesomeIcon icon={faGear} />
                 </NavLink>
               </li>
