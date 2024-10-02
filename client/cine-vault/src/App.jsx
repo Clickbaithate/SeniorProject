@@ -10,6 +10,7 @@ import EmailConfirmationPage from './pages/EmailConfirmationPage';
 import LoginPage from './pages/LoginPage';
 import DiscoverPage from './pages/DiscoverPage'; 
 import SettingsPage from './pages/SettingsPage.jsx';
+import FriendsPage from './pages/FriendsPage.jsx';
 
 function App() {
 
@@ -53,7 +54,8 @@ function App() {
         
         <Route path="/homePage" element={session ? <HomePage /> : <Navigate to="/" />} />
         <Route path="/profileSetup" element={session ? <ProfileSetup /> : <Navigate to="/" />} />
-        <Route path="/emailConfirmationPage" element={<EmailConfirmationPage />} />
+        <Route path="/emailConfirmationPage" element={session ? <HomePage/> : <EmailConfirmationPage /> } />
+        <Route path="/friendsPage" element={session ? <FriendsPage /> : <Navigate to="/" />} />
 
         <Route path="/discover" element={session ? <DiscoverPage /> : <Navigate to="/" />} />
         <Route path="/settings" element={session ? <SettingsPage /> : <Navigate to="/" />} />
