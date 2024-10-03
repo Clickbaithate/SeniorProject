@@ -19,6 +19,7 @@ const SettingsPage = () => {
 
   // Fetch profile and theme settings from Supabase
   useEffect(() => {
+
     const fetchProfile = async () => {
       setLoading(true);
       const { data: { session }, error: sessionError } = await supabase.auth.getSession();
@@ -122,14 +123,13 @@ const handleProfileUpdate = async (e) => {
 
 
   return (
-    <div className="flex min-h-screen flex-col content-area">
+    <div className="flex min-h-screen flex-col content-area ml-[100px] pt-4 bg-red-500">
       <Sidebar />
       <div className="flex flex-1">
         <div className="flex flex-col w-4/12 pl-10 justify-start">
           <h2 className="text-4xl font-bold mb-6 left-0">Settings</h2>
           <h2 className="text-xl mb-4 ml-8">Basic Details</h2>
           <h2 className="text-xl mb-2 ml-8 absolute top-2/4">Theme Settings</h2>
-          
         </div>
 
         <div className="flex flex-1 justify-end pr-20 mt-24">
