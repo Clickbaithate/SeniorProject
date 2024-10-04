@@ -11,6 +11,7 @@ import LoginPage from './pages/LoginPage';
 import DiscoverPage from './pages/DiscoverPage'; 
 import SettingsPage from './pages/SettingsPage.jsx';
 import FriendsPage from './pages/FriendsPage.jsx';
+import MoviePage from './pages/moviePage.jsx';
 
 function App() {
 
@@ -57,6 +58,7 @@ function App() {
         <Route path="/emailConfirmationPage" element={session ? <HomePage/> : <EmailConfirmationPage /> } />
         <Route path="/friendsPage" element={session ? <FriendsPage /> : <Navigate to="/" />} />
 
+        <Route path="/movie/:id" element={session ? <MoviePage /> : <Navigate to="/" />} />
         <Route path="/discover" element={session ? <DiscoverPage /> : <Navigate to="/" />} />
         <Route path="/settings" element={session ? <SettingsPage /> : <Navigate to="/" />} />
 
