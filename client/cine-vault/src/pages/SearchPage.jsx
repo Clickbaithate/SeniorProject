@@ -1,9 +1,16 @@
 import { useEffect, useState } from "react";
+import supabase from "../config/supabaseClient";
+import { useParams } from "react-router-dom";
+import SearchBar from "../components/SearchBar";
+import HorizontalList from "../components/HorizontalList";
 
-const SearchPage = ({ query }) => {
+const SearchPage = () => {
+
   const [movies, setMovies] = useState([]);
   const [shows, setShows] = useState([]);
   const [users, setUsers] = useState([]);
+
+  const { query } = useParams();
 
   useEffect(() => {
     const fetchResults = async () => {
@@ -12,7 +19,7 @@ const SearchPage = ({ query }) => {
         const { data: moviesData, error: moviesError } = await supabase
           .from('Movies')
           .select()
-          .ilike('title', `%${query}%`) // Case insensitive partial match
+          .ilike('title', `%${query}%`)
           .limit(10);
 
         if (moviesError) {
@@ -25,7 +32,7 @@ const SearchPage = ({ query }) => {
         const { data: showsData, error: showsError } = await supabase
           .from('Shows')
           .select()
-          .ilike('title', `%${query}%`) // Case insensitive partial match
+          .ilike('title', `%${query}%`)
           .limit(10);
 
         if (showsError) {
@@ -38,7 +45,7 @@ const SearchPage = ({ query }) => {
         const { data: usersData, error: usersError } = await supabase
           .from('Users')
           .select()
-          .ilike('username', `%${query}%`) // Case insensitive partial match for users
+          .ilike('username', `%${query}%`)
           .limit(10);
 
         if (usersError) {
@@ -53,12 +60,24 @@ const SearchPage = ({ query }) => {
     };
 
     fetchResults();
-  }, [query]); // Re-run when the query changes
+  }, [query]);
 
   return (
-    <div>
-      {/* Display movies, shows, users here */}
-      {/* Example: map through the results and render them */}
+    <div className="">
+      <SearchBar />
+      <h1 className="text-2xl font-bold mb-4">Search Results for "{query}"</h1>
+      <div className="mb-8">
+        <h2 className="text-xl font-semibold">Movies</h2>
+        <HorizontalList movies={movies} />
+      </div>
+
+      <div className="mb-8">
+        <h2 className="text-xl font-semibold">Shows</h2>
+        <HorizontalList movies={shows} />
+      </div>
+
+
+
     </div>
   );
 };
