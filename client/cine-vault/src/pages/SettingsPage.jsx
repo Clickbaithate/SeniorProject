@@ -123,13 +123,13 @@ const handleProfileUpdate = async (e) => {
 
 
   return (
-    <div className="flex min-h-screen flex-col content-area ml-[100px] pt-4 bg-red-500">
+    <div className={`flex min-h-screen flex-col ml-[100px] pt-4 overflow-hidden ${isToggled ? "bg-[#2D2E39]" : "bg-[#FFFFFF]"}`} >
       <Sidebar />
       <div className="flex flex-1">
-        <div className="flex flex-col w-4/12 pl-10 justify-start">
+        <div className={`flex flex-col w-4/12 pl-10 justify-start ${isToggled ? "text-white" : "text-black"}`}>
           <h2 className="text-4xl font-bold mb-6 left-0">Settings</h2>
           <h2 className="text-xl mb-4 ml-8">Basic Details</h2>
-          <h2 className="text-xl mb-2 ml-8 absolute top-2/4">Theme Settings</h2>
+          <h2 className="text-xl mb-2 ml-8 absolute top-3/4">Theme Settings</h2>
         </div>
 
         <div className="flex flex-1 justify-end pr-20 mt-24">
@@ -138,12 +138,12 @@ const handleProfileUpdate = async (e) => {
               <img
                 src={profilePicture || 'https://via.placeholder.com/100'}
                 alt="Profile"
-                className="w-24 h-24 rounded-full border-2 border-gray-700 object-cover"
+                className="w-24 h-24 rounded-full border-2 border-blue-400 object-cover"
               />
             </div>
 
             <div className="mb-4">
-              <label htmlFor="profilePicture" className="block text-sm font-medium mb-1">
+              <label htmlFor="profilePicture" className={`block text-sm font-medium mb-1 ${isToggled ? "text-white" : "text-black"}`}>
                 Profile Picture URL
               </label>
               <input
@@ -156,7 +156,7 @@ const handleProfileUpdate = async (e) => {
             </div>
 
             <div className="mb-4">
-              <label htmlFor="username" className="block text-sm font-medium mb-1">
+              <label htmlFor="username" className={`block text-sm font-medium mb-1 ${isToggled ? "text-white" : "text-black"}`}>
                 Username
               </label>
               <input
@@ -170,7 +170,7 @@ const handleProfileUpdate = async (e) => {
             </div>
 
             <div className="mb-4 ">
-              <label htmlFor="bio" className="block text-sm font-medium mb-1">
+              <label htmlFor="bio" className={`block text-sm font-medium mb-1 ${isToggled ? "text-white" : "text-black"}`}>
                 Bio
               </label>
               <textarea
@@ -185,7 +185,7 @@ const handleProfileUpdate = async (e) => {
               <button
                 type="submit"
                 onClick={handleProfileUpdate}
-                className="px-4 py-2 saveprofile rounded-md"
+                className="px-4 py-2 saveprofile bg-blue-500 rounded-md "
                 disabled={loading}
               >
                 {loading ? 'Saving...' : 'Save Profile'}
@@ -193,8 +193,8 @@ const handleProfileUpdate = async (e) => {
             </div>
 
             {/* Toggle Switch */}
-            <div className='h-10 w-full relative move settings-input rounded-md '>
-              <h2 className="what-theme flex items-center">
+            <div className='h-10 w-full relative top-[165px] settings-input rounded-md '>
+              <h2 className="flex pt-[5px] pl-[5px] items-center">
                 {isToggled ? (
                   <FontAwesomeIcon icon={faMoon} className="mr-2" />
                 ) : (

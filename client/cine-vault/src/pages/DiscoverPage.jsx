@@ -3,6 +3,8 @@ import supabase from '../config/supabaseClient';
 import Sidebar from './Sidebar';
 import SearchBar from '../components/SearchBar';
 import DiscoverCarousel from '../components/DiscoverCarousel';
+import HorizontalList from '../components/HorizontalList';
+
 import { 
   faBomb, faDog, faFaceGrinTears, faFootball, 
   faGhost, faHandFist, faHatCowboy, faHeart, 
@@ -10,8 +12,6 @@ import {
   faMaskVentilator, faPeopleGroup, faRadiation, 
   faRocket, faSailboat, faTape, faTheaterMasks 
 } from "@fortawesome/free-solid-svg-icons";
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import HorizontalList from '../components/HorizontalList';
 
 const genres = [
     { name: 'Sci-fi', value: 'Science Fiction', icon: faRocket },
@@ -36,44 +36,45 @@ const genres = [
 ];
 
 const DiscoverPage = () => {
-
-    const [theme, setTheme] = useState('light');
+    const [theme, setTheme] = useState(localStorage.getItem('theme') || 'light'); // Set initial theme based on localStorage
     const [user, setUser] = useState(null);
-    const [isToggled, setIsToggled] = useState(
-        localStorage.getItem('theme') === 'dark'
-    );
+    const [loading, setLoading] = useState(true); // Loading state to prevent flicker
 
-    // fetching user data
+    // Fetch user data
     useEffect(() => {
-
         const fetchProfile = async () => {
-        const { data: { session }, error: sessionError } = await supabase.auth.getSession();
+            const { data: { session }, error: sessionError } = await supabase.auth.getSession();
 
-        if (sessionError) {
-            console.warn(sessionError);
-            return;
-        }
-
-        if (session) {
-            const { data, error } = await supabase
-            .from('Users')
-            .select()
-            .eq('user_id', session.user.id)
-            .single();
-
-            if (error) {
-            console.warn('Error fetching profile:', error);
-            } else if (data) {
-            setUser(data);
-            console.log(data.profile_picture);
-            setIsToggled(data.theme_settings);
-            setTheme(data.theme_settings ? 'dark' : 'light');
+            if (sessionError) {
+                console.warn(sessionError);
+                return;
             }
-        }
+
+            if (session) {
+                const { data, error } = await supabase
+                    .from('Users')
+                    .select()
+                    .eq('user_id', session.user.id)
+                    .single();
+
+                if (error) {
+                    console.warn('Error fetching profile:', error);
+                } else if (data) {
+                    setUser(data);
+                    setTheme(data.theme_settings ? 'dark' : 'light');
+                    localStorage.setItem('theme', data.theme_settings ? 'dark' : 'light'); // Sync theme
+                }
+            }
+
+            setLoading(false); // End loading when done
         };
 
         fetchProfile();
     }, []);
+
+    useEffect(() => {
+        document.documentElement.setAttribute('data-theme', theme); // Apply theme to HTML element
+    }, [theme]);
 
     // Movies data
     const trendingMovies = [
@@ -133,25 +134,26 @@ const DiscoverPage = () => {
     const images = [];
 
     return (
-        <div className={`ml-[100px] ${theme === "light" ? "bg-[#FFFFFF]" : "bg-[#2D2E39]"} `}>
+        <div className={`ml-[100px] min-h-screen ${theme === "light" ? "bg-[#FFFFFF]" : "bg-[#2D2E39]"} `}>
             <Sidebar />
             <SearchBar placeholder="SEARCH..." theme={theme} />
+
             <DiscoverCarousel images={[
-                "https://www.nbc.com/sites/nbcblog/files/2023/03/the-super-mario-bros-movie-poster-1.jpg", 
-                "https://pbs.twimg.com/media/DcLE2UKVwAUlWK0?format=jpg&name=large", 
-                "https://static1.squarespace.com/static/56a1633ac21b86f80ddeacb4/t/6606c3b0001a0f275cfdf2db/1711719344074/garfield+banner.jpg?format=1500w"
+                "https://www.nbc.com/sites/nbcblog/files/2023/03/the-super-mario-bros-movie-poster-1.jpg",
+                // Add more carousel images here...
             ]} />
 
             <HorizontalList genres={genres} theme={theme} />
-            
+
             <h1 className={`ml-[50px] mt-4 font-body text-3xl ${theme === "light" ? "text-black" : "text-white"}`}>Trending</h1>
             <HorizontalList movies={trendingMovies} theme={theme} />
-            
+
             <h1 className={`ml-[50px] mt-4 font-body text-3xl ${theme === "light" ? "text-black" : "text-white"}`}>Because you watched "Avengers: Endgame"</h1>
             <HorizontalList movies={becauseYouWatchedMovies} theme={theme} />
-            
+
             <h1 className={`ml-[50px] mt-4 font-body text-3xl ${theme === "light" ? "text-black" : "text-white"}`}>Based on what your friends have watched...</h1>
             <HorizontalList movies={basedOnFriendsWatchedMovies} theme={theme} />
+
             <div className="h-12" />
         </div>
     );
