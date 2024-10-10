@@ -11,7 +11,7 @@ const HorizontalList = ({ movies, genres, theme = 'light' }) => {
     if (scrollRef.current) {
       scrollRef.current.scrollBy({
         top: 0,
-        left: -600, 
+        left: -200, 
         behavior: 'smooth',
       });
     }
@@ -22,7 +22,7 @@ const HorizontalList = ({ movies, genres, theme = 'light' }) => {
     if (scrollRef.current) {
       scrollRef.current.scrollBy({
         top: 0,
-        left: 600,
+        left: 200,
         behavior: 'smooth',
       });
     }
