@@ -41,6 +41,8 @@ const DiscoverPage = () => {
     const [isToggled, setIsToggled] = useState(localStorage.getItem('theme') === 'dark');
     const [trendingMovies, setTrendingMovies] = useState();
     const [popularMovies, setPopularMovies] = useState();
+    const [trendingShows, setTrendingShows] = useState();
+    const [popularShows, setPopularShows] = useState();
 
     const movieIds = [
         122,
@@ -120,6 +122,58 @@ const DiscoverPage = () => {
         620249
     ];
 
+    const showIds = [
+        112470,
+        82708,
+        247174,
+        247884,
+        72879,
+
+        260196,
+        262252,
+        75269,
+        61818,
+        2224,
+
+        1416,
+        2734,
+        2051,
+        114439,
+        549,
+
+        1871,
+        1489,
+        75219,
+        103147,
+        92621
+    ];
+
+    const popularShowIds = [
+        1434,
+        1433,
+        131041,
+        456,
+        4614,
+
+        1399,
+        79744,
+        17404,
+        12971,
+        1408,
+
+        1405,
+        1421,
+        63174,
+        71712,
+        37680,
+
+        1396,
+        30984,
+        60574,
+        95479,
+        76479
+    ];
+
     // Fetch user data
     useEffect(() => {
         const fetchProfile = async () => {
@@ -151,11 +205,25 @@ const DiscoverPage = () => {
             console.log(error);
         else 
             setTrendingMovies(data);
+        //
         const { data: d, error: e } = await supabase.from("Movies").select().in("movie_id", popularIds);
         if (e)
             console.log(e);
         else 
             setPopularMovies(d);
+        //
+        const { data: da, error: er } = await supabase.from("Shows").select().in("show_id", showIds);
+        if (er)
+            console.log(er);
+        else 
+            setTrendingShows(da);
+        //
+        const { data: dat, error: err } = await supabase.from("Shows").select().in("show_id", popularShowIds);
+        if (err)
+            console.log(err);
+        else 
+            setPopularShows(dat);
+        //
 
         };
 
@@ -176,12 +244,17 @@ const DiscoverPage = () => {
 
             <HorizontalList genres={genres} theme={theme} />
 
-            <h1 className={`ml-[50px] mt-4 font-body text-3xl ${theme === "light" ? "text-black" : "text-white"}`}>Trending</h1>
+            <h1 className={`ml-[50px] mt-4 font-body text-3xl ${theme === "light" ? "text-black" : "text-white"}`}>Trending Movies</h1>
             {trendingMovies ? <HorizontalList movies={trendingMovies} theme={theme} /> : <h1>Loading</h1>}
 
-            <h1 className={`ml-[50px] mt-4 font-body text-3xl ${theme === "light" ? "text-black" : "text-white"}`}>Popular</h1>
-
+            <h1 className={`ml-[50px] mt-4 font-body text-3xl ${theme === "light" ? "text-black" : "text-white"}`}>Popular Movies</h1>
             {popularMovies ? <HorizontalList movies={popularMovies} theme={theme} /> : <h1>Loading</h1>}
+
+            <h1 className={`ml-[50px] mt-4 font-body text-3xl ${theme === "light" ? "text-black" : "text-white"}`}>Trending Shows</h1>
+            {trendingShows ? <HorizontalList movies={trendingShows} theme={theme} /> : <h1>Loading</h1>}
+
+            <h1 className={`ml-[50px] mt-4 font-body text-3xl ${theme === "light" ? "text-black" : "text-white"}`}>Popular Shows</h1>
+            {popularShows ? <HorizontalList movies={popularShows} theme={theme} /> : <h1>Loading</h1>}
 
             <div className="h-12" />
         </div>
