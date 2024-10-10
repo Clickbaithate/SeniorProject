@@ -25,6 +25,7 @@ const MoviePage = () => {
 
     setMovie(null);
     setLoading(false);
+    setTrendingMovies(null);
     const fetchProfile = async () => {
       const {
         data: { session },
@@ -136,10 +137,10 @@ const MoviePage = () => {
             {/* Content Section */}
             <div className="absolute left-0 top-1/2 transform -translate-y-1/2 flex items-center">
               <img src={movie.image} className="shadow-[rgba(0,0,15,0.5)_10px_15px_4px_0px] min-h-[540px] max-h-[540px] max-w-[380px] rounded-2xl ml-20" />
-              <div className="flex flex-col ml-10 mt-72 font-body">
+              <div className={`flex flex-col ml-10 mr-4 font-body ${movie.overview.length > 440 ? "mt-96" : "mt-72"} `}>
                 {/* Row for title and buttons */}
                 <div className="flex items-center space-x-12">
-                  <div className={`${temp} text-5xl w-[600px]}`}>
+                  <div className={`${temp} text-5xl max-w-[600px] `}>
                     {movie.title}
                   </div>
                   <button onClick={() => handleClose()} className={`transition-all ease-in-out duration-500 transform hover:scale-110 px-3 py-3 flex rounded-full ${ theme === "light" ? "bg-[#E4E4E4]" : "bg-[#25262F]" } shadow-[rgba(0,0,0,0.5)_5px_10px_4px_0px]`} >
@@ -171,7 +172,7 @@ const MoviePage = () => {
                   {movie.tagline}
                 </div>
                 <div className={`${temp} text-2xl`}>Overview</div>
-                <div className={`${temp} py-2`}>{movie.overview}</div>
+                <div className={`${temp} text-wrap py-2`}>{movie.overview}</div>
               </div>
             </div>
           </div>

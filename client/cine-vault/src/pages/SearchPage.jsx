@@ -3,6 +3,7 @@ import supabase from "../config/supabaseClient";
 import { useParams } from "react-router-dom";
 import SearchBar from "../components/SearchBar";
 import HorizontalList from "../components/HorizontalList";
+import { DotLottieReact } from "@lottiefiles/dotlottie-react";
 
 const SearchPage = () => {
 
@@ -13,6 +14,7 @@ const SearchPage = () => {
   const [emptyShows, setEmptyShows] = useState(false);
   const [emptyUsers, setEmptyUsers] = useState(false);
   const [noResults, setNoResults] = useState(false);
+  const [loading, setLoading] = useState(false);
 
   const { query } = useParams();
 
@@ -26,6 +28,7 @@ const SearchPage = () => {
       setEmptyShows(false);
       setEmptyUsers(false);
       setNoResults(false); // Reset before new search
+      setLoading(false);
   
       try {
         // Fetch Movies
@@ -65,7 +68,10 @@ const SearchPage = () => {
           setEmptyUsers(true);
         } else {
           setUsers(usersData);
+          handleTheme(usersData.theme_settings);
         }
+
+        setLoading(true);
   
       } catch (error) {
         console.error('Error fetching results:', error);
@@ -84,6 +90,13 @@ const SearchPage = () => {
       setNoResults(false);
     }
   }, [emptyMovies, emptyShows, emptyUsers]);
+
+  const handleTheme = (theme) => {
+    if (theme === 'light') 
+      document.body.style.backgroundColor = '#FFFFFF';
+    else
+      document.body.style.backgroundColor = '#2D2E39';
+  }
   
 
   // Dark #2D2E39
@@ -103,6 +116,7 @@ const SearchPage = () => {
   const theme = 'dark';
 
   return (
+    loading ?
     <div className={`min-h-screen ${theme === 'light' ? "bg-[#FFFFFF]" : "bg-[#2D2E39]"}`}>
       <SearchBar theme={theme} />
       <h1 className={`text-2xl font-body mb-4 ml-16 ${theme === 'light' ? "text-black" : "text-white"}`}>
@@ -135,9 +149,13 @@ const SearchPage = () => {
           <h2 className={`text-xl font-body ml-16 ${theme === 'light' ? "text-black" : "text-white"}`}>
             Users
           </h2>
-          <HorizontalList movies={users} theme={theme} />
+          <HorizontalList users={users} theme={theme} />
         </div>
       )}
+    </div>
+    :
+    <div className=" flex flex-col justify-center items-center h-screen" >
+      <DotLottieReact src="https://lottie.host/b7f01c92-fc7a-4e49-9153-2e457a694eb2/bHswRE20Tl.json" loop autoplay className="w-56 h-56" />
     </div>
   );
 };

@@ -1,8 +1,9 @@
 import React, { useRef } from 'react';
 import MovieCard from './movieCard';
 import GenreCard from './genreCard';
+import UserCard from './userCard';
 
-const HorizontalList = ({ movies, genres, theme = 'light' }) => {
+const HorizontalList = ({ movies, genres, users, theme = 'light' }) => {
 
   const scrollRef = useRef(null); 
 
@@ -50,8 +51,15 @@ const HorizontalList = ({ movies, genres, theme = 'light' }) => {
               <MovieCard movie={movie} theme={theme} index={index} key={index} />
             ))
           ) : (
-            genres.map((genre, index) => (
-              <GenreCard genre={genre} theme={theme} index={index} key={index} />
+            genres ? 
+            (
+              genres.map((genre, index) => (
+                <GenreCard genre={genre} theme={theme} index={index} key={index} />
+              ))
+            )
+            :
+            users.map((user, index) => (
+              <UserCard user={user} theme={theme} index={index} key={index} />
             ))
           )
         }
