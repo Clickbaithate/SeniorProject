@@ -53,7 +53,11 @@ const Sidebar = () => {
                   <FontAwesomeIcon icon={faCompass} />
                 </NavLink>
               </li>
-              <li><FontAwesomeIcon icon={faGlasses} /></li>
+              <li>
+                <NavLink to="/watched" className="active-link"> 
+                <FontAwesomeIcon icon={faGlasses} />
+                </NavLink>
+              </li>
               <li><FontAwesomeIcon icon={faFolder} /></li>
               <li>
                 <NavLink to="/friendsPage" className="active-link">

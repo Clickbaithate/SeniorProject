@@ -11,13 +11,14 @@ import { useNavigate } from 'react-router-dom';
 
 // You have to at least pass in a theme parameter
 const SearchBar = ({ placeholder = "Search...", theme }) => {
+  
   const [searchText, setSearchText] = useState("");
   const navigate = useNavigate();
 
   // Here we would navigate to the search page by passing in the query thing
   const handleSearch = (e) => {
     e.preventDefault();
-    console.log(searchText);
+    navigate(`/searchPage/${searchText}`)
   };
 
   const handleProfileClick = () => {
