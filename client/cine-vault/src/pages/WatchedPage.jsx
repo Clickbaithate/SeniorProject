@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import supabase from '../config/supabaseClient';
 import Sidebar from './Sidebar';
 import SearchBar from '../components/SearchBar.jsx';
+import VerticalList from '../components/VerticalList.jsx';
 import "../App.css";
 
 const WatchedPage = () => {
@@ -91,24 +92,8 @@ const WatchedPage = () => {
                     )}
                 </div>
 
-                <div className="grid-cols-5 gap-[10px] grid">
-                        {movies.length > 0 ? (
-                            movies.map((movie)=>(
-                                <div key={movie.movie_id} className={`w-[200px] p-2.5 hover:scale-110 duration-500 cursor-pointer ${theme === "light" ? "bg-[#FFFFFF]" : "bg-[#2D2E39]"}`}>
-                                    <div className='w-full'>
-                                    <img
-                                        src={movie.image || 'https://via.placeholder.com/150'}
-                                        alt={movie.title}
-                                        className="w-full h-[250px] object-cover rounded-[10px] mb-2 "
-                                    />
-                                    </div>
-                                    <h3 className={`text-lg font-semibold ${theme === 'light' ? 'text-black' : 'text-white'}`}>{movie.title}</h3>
-                                </div>
-                            ))
-                            ):(
-                                <p>No movies available.</p>
-                        )}
-                    </div>
+                <VerticalList movies={movies} theme={theme} />
+
             </div>
         </div>
     );
