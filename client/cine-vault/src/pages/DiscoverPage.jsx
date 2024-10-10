@@ -3,6 +3,8 @@ import supabase from '../config/supabaseClient';
 import Sidebar from './Sidebar';
 import SearchBar from '../components/SearchBar';
 import DiscoverCarousel from '../components/DiscoverCarousel';
+import HorizontalList from '../components/HorizontalList';
+
 import { 
   faBomb, faDog, faFaceGrinTears, faFootball, 
   faGhost, faHandFist, faHatCowboy, faHeart, 
@@ -10,8 +12,6 @@ import {
   faMaskVentilator, faPeopleGroup, faRadiation, 
   faRocket, faSailboat, faTape, faTheaterMasks 
 } from "@fortawesome/free-solid-svg-icons";
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import HorizontalList from '../components/HorizontalList';
 
 const genres = [
     { name: 'Sci-fi', value: 'Science Fiction', icon: faRocket },
@@ -36,8 +36,7 @@ const genres = [
 ];
 
 const DiscoverPage = () => {
-
-    const [theme, setTheme] = useState('light');
+    const [theme, setTheme] = useState(localStorage.getItem('theme') || 'light'); // Set initial theme based on localStorage
     const [user, setUser] = useState(null);
     const [isToggled, setIsToggled] = useState(localStorage.getItem('theme') === 'dark');
     const [trendingMovies, setTrendingMovies] = useState();
@@ -121,9 +120,8 @@ const DiscoverPage = () => {
         620249
     ];
 
-    // fetching user data
+    // Fetch user data
     useEffect(() => {
-
         const fetchProfile = async () => {
         const { data: { session }, error: sessionError } = await supabase.auth.getSession();
 
@@ -153,7 +151,6 @@ const DiscoverPage = () => {
             console.log(error);
         else 
             setTrendingMovies(data);
-
         const { data: d, error: e } = await supabase.from("Movies").select().in("movie_id", popularIds);
         if (e)
             console.log(e);
@@ -168,7 +165,7 @@ const DiscoverPage = () => {
     const images = [];
 
     return (
-        <div className={`ml-[100px] ${theme === "light" ? "bg-[#FFFFFF]" : "bg-[#2D2E39]"} `}>
+        <div className={`ml-[100px] min-h-screen ${theme === "light" ? "bg-[#FFFFFF]" : "bg-[#2D2E39]"} `}>
             <Sidebar />
             <SearchBar placeholder="SEARCH..." theme={theme} />
             <DiscoverCarousel movies={[
@@ -178,15 +175,13 @@ const DiscoverPage = () => {
             ]} />
 
             <HorizontalList genres={genres} theme={theme} />
-            
-            <h1 className={`ml-[50px] mt-4 font-body text-3xl ${theme === "light" ? "text-black" : "text-white"}`}>Trending</h1>
 
+            <h1 className={`ml-[50px] mt-4 font-body text-3xl ${theme === "light" ? "text-black" : "text-white"}`}>Trending</h1>
             {trendingMovies ? <HorizontalList movies={trendingMovies} theme={theme} /> : <h1>Loading</h1>}
 
             <h1 className={`ml-[50px] mt-4 font-body text-3xl ${theme === "light" ? "text-black" : "text-white"}`}>Popular</h1>
 
             {popularMovies ? <HorizontalList movies={popularMovies} theme={theme} /> : <h1>Loading</h1>}
-
 
             <div className="h-12" />
         </div>
