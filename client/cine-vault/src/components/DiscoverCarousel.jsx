@@ -1,30 +1,39 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 
-const DiscoverCarousel = ({ images }) => {
+const DiscoverCarousel = ({ movies }) => {
 
   const [currentSlide, setCurrentSlide] = useState(0);
   const [isTransitioning, setIsTransitioning] = useState(false);
+  const [currentMovie, setCurrentMovie] = useState(movies[currentSlide]);
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    setCurrentMovie(movies[currentSlide]);
+  }, [currentSlide]);
 
   const handlePrev = () => {
     if (!isTransitioning) {
       setIsTransitioning(true);
       setCurrentSlide((prevSlide) =>
-        prevSlide === 0 ? images.length - 1 : prevSlide - 1
+        prevSlide === 0 ? movies.length - 1 : prevSlide - 1
       );
     }
+    setCurrentMovie(movies[currentSlide]);
   };
 
   const handleNext = () => {
     if (!isTransitioning) {
       setIsTransitioning(true);
       setCurrentSlide((prevSlide) =>
-        prevSlide === images.length - 1 ? 0 : prevSlide + 1
+        prevSlide === movies.length - 1 ? 0 : prevSlide + 1
       );
     }
+    setCurrentMovie(movies[currentSlide]);
   };
 
-  const handleClick = () => {
-    console.log(currentSlide)
+  const handleClick = (id) => {
+    navigate(`/movie/${id}`);
   }
 
   const handleTransitionEnd = () => {
@@ -35,9 +44,9 @@ const DiscoverCarousel = ({ images }) => {
     <div className="w-full px-12 flex justify-center">
       <div id="dynamic-carousel" className="relative w-full" data-carousel="slide">
         <div className="relative h-[500px] overflow-hidden rounded-[50px]">
-          {images.map((image, index) => (
+          {movies.map((movie, index) => (
             <div
-              onClick={() => handleClick()} 
+              onClick={() => handleClick(currentMovie.movie_id)} 
               key={index}
               className={`cursor-pointer absolute inset-0 transition-opacity duration-700 ${
                 index === currentSlide ? 'opacity-100' : 'opacity-0'
@@ -46,7 +55,7 @@ const DiscoverCarousel = ({ images }) => {
               data-carousel-item
             >
               <img
-                src={image}
+                src={movie.image}
                 className="absolute block w-full h-full object-cover"
                 alt={`Slide ${index + 1}`}
               />
@@ -55,12 +64,12 @@ const DiscoverCarousel = ({ images }) => {
         </div>
 
         <div className="absolute z-30 flex -translate-x-1/2 bottom-5 left-1/2 space-x-3 rtl:space-x-reverse">
-          {images.map((_, index) => (
+          {movies.map((_, index) => (
             <button
               key={index}
               type="button"
-              className={`w-16 h-2 rounded-lg ${
-                index === currentSlide ? 'bg-black' : 'bg-gray-400'
+              className={`w-24 h-1 rounded-lg ${
+                index === currentSlide ? 'bg-white' : 'bg-gray-400'
               }`}
               aria-current={index === currentSlide}
               aria-label={`Slide ${index + 1}`}
