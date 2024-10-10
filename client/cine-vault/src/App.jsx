@@ -14,6 +14,9 @@ import FriendsPage from './pages/FriendsPage.jsx';
 import ChallengesPage from './pages/ChallengesPage.jsx';
 import PlaylistsPage from './pages/PlaylistsPage.jsx';
 import CategoriesPage from './pages/CategoriesPage.jsx';
+import MoviePage from './pages/moviePage.jsx';
+import SearchPage from './pages/SearchPage.jsx';
+import WatchedPage from './pages/WatchedPage.jsx';
 
 function App() {
   const [session, setSession] = useState(null);
@@ -57,7 +60,9 @@ function App() {
         <Route path="/profileSetup" element={session ? <ProfileSetup /> : <Navigate to="/" />} />
         <Route path="/emailConfirmationPage" element={session ? <HomePage /> : <EmailConfirmationPage />} />
         <Route path="/friendsPage" element={session ? <FriendsPage /> : <Navigate to="/" />} />
+        <Route path="/searchPage/:query" element={session ? <SearchPage /> : <Navigate to="/" />} />
 
+        <Route path="/movie/:id" element={session ? <MoviePage /> : <Navigate to="/" />} />
         <Route path="/discover" element={session ? <DiscoverPage /> : <Navigate to="/" />} />
         <Route path="/settings" element={session ? <SettingsPage /> : <Navigate to="/" />} />
         
@@ -65,8 +70,7 @@ function App() {
         <Route path="/challenges" element={session ? <ChallengesPage /> : <Navigate to="/" />} />
         <Route path="/playlists" element={session ? <PlaylistsPage /> : <Navigate to="/" />} />
         <Route path="/categories" element={session ? <CategoriesPage /> : <Navigate to="/" />} />
-
-        {/* Catch-all redirect to homePage or landing page */}
+        <Route path="/watched" element={session ? <WatchedPage /> : <Navigate to="/" />} />
         <Route path="*" element={session ? <Navigate to="/homePage" /> : <Navigate to="/" />} />
       </Routes>
     </Router>
