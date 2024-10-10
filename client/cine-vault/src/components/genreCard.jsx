@@ -1,7 +1,10 @@
 import React from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { useNavigate } from "react-router-dom";
 
 const GenreCard = ({ genre, theme, index }) => {
+
+  const navigate = useNavigate();
 
   // Dark #2D2E39
   // Dark Contrast #25262F
@@ -10,7 +13,7 @@ const GenreCard = ({ genre, theme, index }) => {
   // Light Contrast #E4E4E4
 
   const handleClick = (title) => {
-    console.log(title);
+    navigate(`/categories`)
   }
 
   return (
