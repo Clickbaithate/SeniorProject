@@ -12,6 +12,7 @@ import DiscoverPage from './pages/DiscoverPage';
 import SettingsPage from './pages/SettingsPage.jsx';
 import FriendsPage from './pages/FriendsPage.jsx';
 import MoviePage from './pages/moviePage.jsx';
+import WatchedPage from './pages/WatchedPage.jsx';
 
 function App() {
 
@@ -61,6 +62,8 @@ function App() {
         <Route path="/movie/:id" element={session ? <MoviePage /> : <Navigate to="/" />} />
         <Route path="/discover" element={session ? <DiscoverPage /> : <Navigate to="/" />} />
         <Route path="/settings" element={session ? <SettingsPage /> : <Navigate to="/" />} />
+
+        <Route path="/watched" element={session ? <WatchedPage /> : <Navigate to="/" />} />
 
         <Route path="*" element={session ? <Navigate to="/homePage" /> : <Navigate to="/" />} />
       </Routes>
