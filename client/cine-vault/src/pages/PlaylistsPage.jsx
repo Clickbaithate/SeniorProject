@@ -1,72 +1,144 @@
 import React from 'react';
 import Sidebar from './Sidebar';
+import SearchBar from '../components/SearchBar';
+import { useEffect, useState } from 'react';
+import supabase from '../config/supabaseClient';
+import { faSearch } from '@fortawesome/free-solid-svg-icons';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 
-// basic playlist page outlook for how we want to display information over movies that users want to watch and have watched, etc
-const playlists = [
+const popularPlaylists = [
   {
-    name: 'Watched',
-    description: 'Movies you have already watched.',
-    movies: [
-      { title: 'The Godfather', year: 1972 },
-      { title: 'John Wick', year: 2014 },
-    ],
+    image: "https://static.displate.com/1200x857/displate/2023-02-20/ce0823168185db6a7d1285bb195e2e8c_44f10645b8dea479c868ff4057d55105.jpg",
+    title: "Everything Marvel"
   },
   {
-    name: 'Want to Watch',
-    description: 'Movies you want to watch in the future.',
-    movies: [
-      { title: 'Parasite', year: 2019 },
-      { title: 'Mad Max: Fury Road', year: 2015 },
-    ],
+    image: "https://pbs.twimg.com/media/FvnRS1tXwAMZTN-.jpg",
+    title: "Christopher Nolan Movies"
   },
   {
-    name: 'Currently Watching',
-    description: 'Movies you are in the middle of watching.',
-    movies: [
-      { title: 'The Grand Budapest Hotel', year: 2014 },
-      { title: 'Interstellar', year: 2014 },
-    ],
+    image: "https://cdna.artstation.com/p/assets/images/images/003/205/438/large/anderson-vieira-banner-starwars.jpg?1471027030",
+    title: "Star Wars Saga"
   },
   {
-    name: 'Favorites',
-    description: 'Your all-time favorite movies.',
-    movies: [
-      { title: 'The Lord of the Rings: The Fellowship of the Ring', year: 2001 },
-      { title: 'Superbad', year: 2007 },
-    ],
+    image: "https://i.pinimg.com/736x/99/9f/03/999f03d2cf0fdf405dcb2d6e6641a0ad.jpg",
+    title: "Horror Films"
   },
   {
-    name: 'Tracked',
-    description: 'Movies you are following for updates or new releases.',
-    movies: [
-      { title: 'Blade Runner 2049', year: 2017 },
-      { title: 'A Quiet Place Part II', year: 2021 },
-    ],
-  },
+    image: "https://static.vecteezy.com/system/resources/previews/001/821/684/non_2x/christmas-banner-for-present-product-with-christmas-tree-on-red-background-text-merry-christmas-and-happy-new-year-free-vector.jpg",
+    title: "Christmas Vibes"
+  }
 ];
 
 const PlaylistPage = () => {
+
+  const [theme, setTheme] = useState("light");
+  const [searchText, setSearchText] = useState("");
+  const [filterCount, setFilterCount] = useState(0);
+
+  const handleSearch = () => {
+    console.log(searchText);
+  }
+
+  const handleFilter = () => {
+    console.log("FILTER BUTTON!");
+  }
+
+  const incrementFilterCount = () => {
+    setFilterCount(prevCount => prevCount + 1);
+  }
+
+  const decrementFilterCount = () => {
+    setFilterCount(prevCount => prevCount - 1);
+  }
+
+  const handlePlaylistClick = (playlist) => {
+    console.log(playlist);
+  }
+
+  useEffect(() => {
+    const fetchProfile = async () => {
+    const { data: { session }, error: sessionError } = await supabase.auth.getSession();
+
+    if (sessionError) {
+        console.warn(sessionError);
+        return;
+    }
+
+    if (session) {
+        const { data, error } = await supabase
+        .from('Users')
+        .select()
+        .eq('user_id', session.user.id)
+        .single();
+
+        if (error) {
+        console.warn('Error fetching profile:', error);
+        } else if (data) {
+        setTheme(data.theme_settings ? 'dark' : 'light');
+        }
+    }
+
+    };
+
+    fetchProfile();
+  }, []);
+
+  // Dark #2D2E39
+  // Dark Contrast #25262F
+
+  // Light #FFFFFF
+  // Light Contrast #E4E4E4
+
   return (
-    <div className="min-h-screen bg-gray-900 text-white flex flex-col items-center p-6">
+
+    <div className={`min-h-screen ml-[100px] ${theme === "light" ? "bg-[#FFFFFF]" : "bg-[#2D2E39]" } `}>
+
       <Sidebar></Sidebar>
-      <h1 className="text-4xl font-bold mb-8">Movie Playlists</h1>
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 w-full max-w-4xl">
-        {playlists.map((playlist, index) => (
-          <div key={index} className="bg-gray-800 shadow-md rounded-lg p-6">
-            <h2 className="text-2xl font-semibold mb-2">{playlist.name}</h2>
-            <p className="text-gray-400 mb-4">{playlist.description}</p>
-            <ul className="space-y-2">
-              {playlist.movies.map((movie, idx) => (
-                <li key={idx} className="flex justify-between text-lg text-gray-300">
-                  <span>{movie.title}</span>
-                  <span className="text-gray-500">{movie.year}</span>
-                </li>
-              ))}
-            </ul>
+      <SearchBar></SearchBar>
+      {/* Page Title */}
+      <h1 className={`text-4xl font-body py-2 ml-12 ${theme === "light" ? "text-black" : "text-white"} `}>Movie Playlists</h1>
+      {/* Filters, etc */}
+      <div className={`flex items-center justify-end px-12 font-body ${theme === "light" ? "text-black" : "text-white"} `}>
+        <div className="flex items-center justify-center space-x-4 " >
+          {/* Filter Counter */}
+          <div className={`h-8 w-8 flex items-center justify-center rounded-full font-body shadow-[rgba(0,0,15,0.5)_10px_5px_4px_0px] ${theme === "light" ? "bg-[#E4E4E4] text-black" : "bg-[#25262F] text-white "} `} >
+            {filterCount}
+          </div>
+          {/* Filter Button */}
+          <div onClick={handleFilter} className={`font-body cursor-pointer w-18 h-10 p-4 flex items-center justify-center rounded-lg shadow-[rgba(0,0,15,0.5)_10px_5px_4px_0px] ${theme === "light" ? "bg-[#E4E4E4] text-black" : "bg-[#25262F] text-white "} `} >
+            Add Filter
+          </div>
+          {/* Filter Search */}
+          <form onSubmit={handleSearch} className={`flex items-center rounded-lg p-2 w-64 shadow-[rgba(0,0,15,0.5)_10px_5px_4px_0px] ${theme === "light" ? "bg-[#E4E4E4]" : "bg-[#25262F]"} `}>
+            <button type="button" onClick={handleSearch} className="mr-2">
+              <FontAwesomeIcon icon={faSearch} className="text-gray-500" />
+            </button>
+            <input
+              type="text"
+              placeholder="Search your playlists..."
+              className={`w-full focus:outline-none bg-transparent font-body ${theme === "light" ? "text-black" : "text-white"} `}
+              value={searchText}
+              onChange={(e) => setSearchText(e.target.value)}
+            />
+          </form>
+
+        </div>
+      </div>
+
+      <h1 className={`font-body ml-20 pt-8 ${theme === "light" ? "text-black" : "text-white"}`} >Popular Playlists</h1>
+
+      <div className="flex cursor-pointer items-center justify-start ml-20 space-x-10 overflow-x-auto py-8 scrollbar-thin scrollbar-track-[#25262F] scrollbar-thumb-[#2D2E39] scrollbar-corner-yellow-500">
+        {popularPlaylists.map((playlist, index) => (
+          <div onClick={() => handlePlaylistClick(playlist.title)} key={index} className="min-w-96 max-w-96">
+            <div className="h-56 rounded-2xl flex-shrink-0" style={{ background: `url(${playlist.image})`, backgroundSize: "cover", backgroundPosition: "center" }} />
+            <p className={`mt-2 font-body text-center ${theme === "light" ? "text-black" : "text-white"}`}>{playlist.title}</p>
           </div>
         ))}
       </div>
+
+
     </div>
+
   );
 };
 
