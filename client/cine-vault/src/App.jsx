@@ -13,7 +13,7 @@ import SettingsPage from './pages/SettingsPage.jsx';
 import FriendsPage from './pages/FriendsPage.jsx';
 import ChallengesPage from './pages/ChallengesPage.jsx';
 import PlaylistsPage from './pages/PlaylistsPage.jsx';
-import CategoriesPage from './pages/CategoriesPage.jsx';
+import MovieCategories from './pages/GenrePage.jsx';
 import MoviePage from './pages/moviePage.jsx';
 import SearchPage from './pages/SearchPage.jsx';
 import WatchedPage from './pages/WatchedPage.jsx';
@@ -69,7 +69,7 @@ function App() {
         {/*i am testing my push - marcus*/}
         <Route path="/challenges" element={session ? <ChallengesPage /> : <Navigate to="/" />} />
         <Route path="/playlists" element={session ? <PlaylistsPage /> : <Navigate to="/" />} />
-        <Route path="/categories" element={session ? <CategoriesPage /> : <Navigate to="/" />} />
+        <Route path="/categories" element={session ? <MovieCategories /> : <Navigate to="/" />} />
         <Route path="/watched" element={session ? <WatchedPage /> : <Navigate to="/" />} />
         <Route path="*" element={session ? <Navigate to="/homePage" /> : <Navigate to="/" />} />
       </Routes>

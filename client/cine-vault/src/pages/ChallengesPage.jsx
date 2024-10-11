@@ -18,7 +18,7 @@ const ChallengesPage = () => {
       {/* Sidebar */}
       <Sidebar />
 
-      <div className="content-area flex-1 p-8">
+      <div className="content-area ml-[100px] flex-1 px-4 ">
         {/* Page Title */}
         {challenges.length > 0 && (
           <div className="search-bar-container mb-6">
