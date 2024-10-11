@@ -1,4 +1,5 @@
 import React from 'react';
+import Sidebar from './Sidebar';
 
 // basic playlist page outlook for how we want to display information over movies that users want to watch and have watched, etc
 const playlists = [
@@ -47,6 +48,7 @@ const playlists = [
 const PlaylistPage = () => {
   return (
     <div className="min-h-screen bg-gray-900 text-white flex flex-col items-center p-6">
+      <Sidebar></Sidebar>
       <h1 className="text-4xl font-bold mb-8">Movie Playlists</h1>
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 w-full max-w-4xl">
         {playlists.map((playlist, index) => (

@@ -43,33 +43,49 @@ const Sidebar = () => {
           </div>
           <nav className="sidebar-nav">
             <ul>
+              {/* HomePage */}
               <li>
                 <NavLink to="/homePage" className="active-link">
                   <FontAwesomeIcon icon={faHouse} />
                 </NavLink>
               </li>
+              {/* DiscoverPage */}
               <li>
                 <NavLink to="/discover" className="active-link">
                   <FontAwesomeIcon icon={faCompass} />
                 </NavLink>
               </li>
+              {/* WatchedPage */}
               <li>
                 <NavLink to="/watched" className="active-link"> 
                 <FontAwesomeIcon icon={faGlasses} />
                 </NavLink>
               </li>
-              <li><FontAwesomeIcon icon={faFolder} /></li>
+              {/* PlaylistsPage */}
+              <li>
+                <NavLink to="/playlists" className="active-link" >
+                  <FontAwesomeIcon icon={faFolder} />
+                </NavLink>
+              </li>
+              {/* FriendsPage */}
               <li>
                 <NavLink to="/friendsPage" className="active-link">
                   <FontAwesomeIcon icon={faUserGroup} />
                 </NavLink>
               </li>
-              <li><FontAwesomeIcon icon={faAward} /></li>
+              {/* ChallengesPage */}
+              <li>
+                <NavLink to="/challenges" className="active-link" >
+                  <FontAwesomeIcon icon={faAward} />
+                </NavLink>
+              </li>
+              {/* SettingsPage */}
               <li>
                 <NavLink to="/settings" className="active-link">
                   <FontAwesomeIcon icon={faGear} />
                 </NavLink>
               </li>
+              {/* LogoutPage */}
               <li>
                 <button onClick={handleLogoutClick} className="logout-icon">
                   <FontAwesomeIcon icon={faArrowRightFromBracket} />
