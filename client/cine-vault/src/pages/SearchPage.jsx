@@ -4,6 +4,7 @@ import { useParams } from "react-router-dom";
 import SearchBar from "../components/SearchBar";
 import HorizontalList from "../components/HorizontalList";
 import { DotLottieReact } from "@lottiefiles/dotlottie-react";
+import "./theme.css";
 
 const SearchPage = () => {
 
@@ -68,7 +69,6 @@ const SearchPage = () => {
           setEmptyUsers(true);
         } else {
           setUsers(usersData);
-          handleTheme(usersData.theme_settings);
         }
 
         setLoading(true);
@@ -90,13 +90,6 @@ const SearchPage = () => {
       setNoResults(false);
     }
   }, [emptyMovies, emptyShows, emptyUsers]);
-
-  const handleTheme = (theme) => {
-    if (theme === 'light') 
-      document.body.style.backgroundColor = '#FFFFFF';
-    else
-      document.body.style.backgroundColor = '#2D2E39';
-  }
   
 
   // Dark #2D2E39
@@ -113,43 +106,41 @@ const SearchPage = () => {
     }
   }, [emptyMovies, emptyShows, emptyUsers]); 
 
-  const theme = 'dark';
-
   return (
     loading ?
-    <div className={`min-h-screen ${theme === 'light' ? "bg-[#FFFFFF]" : "bg-[#2D2E39]"}`}>
-      <SearchBar theme={theme} />
-      <h1 className={`text-2xl font-body mb-4 ml-16 ${theme === 'light' ? "text-black" : "text-white"}`}>
+    <div className={`min-h-screen bg-theme `}>
+      <SearchBar />
+      <h1 className={`text-2xl font-body mb-4 ml-16 text-theme `}>
         {noResults ? "No Results Found" : `Results For: ${query}`}
       </h1>
   
       {/* Render Movies section only if there are movies */}
       {movies.length > 0 && (
         <div className="mb-8">
-          <h2 className={`text-xl font-body ml-16 ${theme === 'light' ? "text-black" : "text-white"}`}>
+          <h2 className={`text-xl font-body ml-16 text-theme `}>
             Movies
           </h2>
-          <HorizontalList movies={movies} theme={theme} />
+          <HorizontalList movies={movies} />
         </div>
       )}
   
       {/* Render Shows section only if there are shows */}
       {shows.length > 0 && (
         <div className="mb-8">
-          <h2 className={`text-xl font-body ml-16 ${theme === 'light' ? "text-black" : "text-white"}`}>
+          <h2 className={`text-xl font-body ml-16 text-theme `}>
             Shows
           </h2>
-          <HorizontalList movies={shows} theme={theme} />
+          <HorizontalList movies={shows} />
         </div>
       )}
   
       {/* Render Users section only if there are users */}
       {users.length > 0 && (
         <div className="mb-8">
-          <h2 className={`text-xl font-body ml-16 ${theme === 'light' ? "text-black" : "text-white"}`}>
+          <h2 className={`text-xl font-body ml-16 text-theme `}>
             Users
           </h2>
-          <HorizontalList users={users} theme={theme} />
+          <HorizontalList users={users} />
         </div>
       )}
     </div>

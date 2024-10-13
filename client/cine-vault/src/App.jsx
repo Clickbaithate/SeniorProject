@@ -59,7 +59,7 @@ function App() {
         <Route path="/homePage" element={session ? <HomePage /> : <Navigate to="/" />} />
         <Route path="/profileSetup" element={session ? <ProfileSetup /> : <Navigate to="/" />} />
         <Route path="/emailConfirmationPage" element={session ? <HomePage /> : <EmailConfirmationPage />} />
-        <Route path="/friendsPage" element={session ? <FriendsPage /> : <Navigate to="/" />} />
+        <Route path="/friends" element={session ? <FriendsPage /> : <Navigate to="/" />} />
         <Route path="/searchPage/:query" element={session ? <SearchPage /> : <Navigate to="/" />} />
 
         <Route path="/movie/:id" element={session ? <MoviePage /> : <Navigate to="/" />} />

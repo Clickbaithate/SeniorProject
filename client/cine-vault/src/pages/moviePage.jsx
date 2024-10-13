@@ -101,7 +101,7 @@ const MoviePage = () => {
 
   return (
     loading ? 
-    <div className={` `}>
+    <div className={``}>
       <div className={`relative h-[1000px] flex flex-col `} >
         {/* Top Half */}
         <div className="relative flex flex-1 justify-end items-start rounded-br-3xl rounded-bl-3xl">
