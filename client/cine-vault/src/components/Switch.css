@@ -1,7 +1,7 @@
 .switch{
     position: absolute;
-    top: 3px;
-    left: 448px;
+    top: 6px;
+    left: 435px;
     display: inline-block;
     width: 60px;
     height: 34px;
@@ -39,7 +39,7 @@
 }
 
 input:checked + .slider {
-    background-color: #485e4e;
+    background-color: #3f4146;
 }
 
 input:checked + .slider::before{

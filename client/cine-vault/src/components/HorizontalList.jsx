@@ -3,7 +3,7 @@ import MovieCard from './movieCard';
 import GenreCard from './genreCard';
 import UserCard from './userCard';
 
-const HorizontalList = ({ movies, genres, users, theme = 'light' }) => {
+const HorizontalList = ({ movies, genres, users }) => {
 
   const scrollRef = useRef(null); 
 
@@ -48,18 +48,18 @@ const HorizontalList = ({ movies, genres, users, theme = 'light' }) => {
         {
           movies ? (
             movies.map((movie, index) => (
-              <MovieCard movie={movie} theme={theme} index={index} key={index} />
+              <MovieCard movie={movie} index={index} key={index} />
             ))
           ) : (
             genres ? 
             (
               genres.map((genre, index) => (
-                <GenreCard genre={genre} theme={theme} index={index} key={index} />
+                <GenreCard genre={genre} index={index} key={index} />
               ))
             )
             :
             users.map((user, index) => (
-              <UserCard user={user} theme={theme} index={index} key={index} />
+              <UserCard user={user} index={index} key={index} />
             ))
           )
         }

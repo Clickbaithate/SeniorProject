@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import Sidebar from './Sidebar';
 import SearchBar from '../components/SearchBar';
+import "./theme.css";
 
 const ChallengesPage = () => {
   const [challenges, setChallenges] = useState([
@@ -14,30 +15,30 @@ const ChallengesPage = () => {
   const getProgressPercentage = (progress, total) => (progress / total) * 100;
 
   return (
-    <div className="page-layout flex">
+    <div className="flex bg-theme">
       {/* Sidebar */}
       <Sidebar />
 
-      <div className="content-area ml-[100px] flex-1 px-4 ">
+      <div className="ml-[100px] flex-1 px-4 ">
         {/* Page Title */}
         {challenges.length > 0 && (
-          <div className="search-bar-container mb-6">
+          <div className="mb-6">
             <SearchBar placeholder="Search Challenges..." />
           </div>
         )}
 
         {/* Challenges List */}
-        <div className="challenge-list">
+        <div className="">
           {challenges.length > 0 ? (
             challenges.map((challenge) => (
-              <div key={challenge.id} className="challenge-item bg-white shadow-md rounded-lg p-4 mb-4">
-                <h3 className="text-lg font-semibold">{challenge.name}</h3>
-                <p className="text-gray-600 mb-2">{challenge.description}</p>
+              <div key={challenge.id} className="accent shadow-md rounded-lg p-4 mb-4">
+                <h3 className="text-lg font-semibold text-theme">{challenge.name}</h3>
+                <p className="text-theme mb-2">{challenge.description}</p>
 
                 {/* Progress Bar */}
-                <div className="progress-container bg-gray-200 rounded-full h-2 mb-2" aria-label="Progress bar">
+                <div className="bg-theme rounded-full h-2 mb-2" aria-label="Progress bar">
                   <div
-                    className="progress-bar bg-green-500 h-2 rounded-full"
+                    className="bg-green-500 h-2 rounded-full"
                     style={{ width: `${getProgressPercentage(challenge.progress, challenge.total)}%` }}
                     role="progressbar"
                     aria-valuenow={challenge.progress}
@@ -46,7 +47,7 @@ const ChallengesPage = () => {
                   />
                 </div>
 
-                <p className="text-sm text-gray-700">
+                <p className="text-sm text-theme">
                   {challenge.progress}/{challenge.total} completed
                 </p>
               </div>

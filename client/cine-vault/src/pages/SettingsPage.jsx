@@ -4,22 +4,21 @@ import Sidebar from './Sidebar';
 import Switch from '../components/Switch.jsx';
 import "../App.css";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import {faSun, faMoon} from "@fortawesome/free-solid-svg-icons";
-
+import { faSun, faMoon } from "@fortawesome/free-solid-svg-icons";
+import "./theme.css";
 
 const SettingsPage = () => {
+
   const [loading, setLoading] = useState(true);
   const [username, setUsername] = useState('');
   const [bio, setBio] = useState('');
   const [profilePicture, setProfilePicture] = useState('');
   const [message, setMessage] = useState('');
-  const [isToggled, setIsToggled] = useState(
-    localStorage.getItem('theme') === 'dark'
-  );
+  const [isToggled, setIsToggled] = useState(localStorage.getItem('theme') === 'dark');
+  const [sidebarKey, setSidebarKey] = useState(0); // State to force sidebar re-render
 
   // Fetch profile and theme settings from Supabase
   useEffect(() => {
-
     const fetchProfile = async () => {
       setLoading(true);
       const { data: { session }, error: sessionError } = await supabase.auth.getSession();
@@ -45,7 +44,7 @@ const SettingsPage = () => {
           setProfilePicture(data.profile_picture);
           setIsToggled(data.theme_settings); // Set the toggle state based on database value
           const theme = data.theme_settings ? 'dark' : 'light';
-          document.documentElement.setAttribute('data-theme', theme);
+          document.documentElement.setAttribute('theme-data', theme);
           localStorage.setItem('theme', theme); // Sync local storage with database value
         }
       }
@@ -64,7 +63,12 @@ const SettingsPage = () => {
 
   // Update theme settings in Supabase when toggled
   const handleThemeToggle = async () => {
-    setIsToggled(!isToggled);
+    setIsToggled((prev) => {
+      const newToggle = !prev;
+      setSidebarKey((key) => key + 1); // Update sidebar key to trigger re-render
+      return newToggle;
+    });
+
     try {
       const { data: { session } } = await supabase.auth.getSession();
       const { error } = await supabase
@@ -80,56 +84,51 @@ const SettingsPage = () => {
     }
   };
 
-// Handle profile update
-const handleProfileUpdate = async (e) => {
-  e.preventDefault();
-  setLoading(true);
+  // Handle profile update
+  const handleProfileUpdate = async (e) => {
+    e.preventDefault();
+    setLoading(true);
 
-  try {
-    // Fetch the session to get user information
-    const { data: { session }, error: sessionError } = await supabase.auth.getSession();
+    try {
+      const { data: { session }, error: sessionError } = await supabase.auth.getSession();
 
-    if (sessionError) {
-      console.warn('Session error:', sessionError);
-      setMessage(`Error: ${sessionError.message}`);
+      if (sessionError) {
+        console.warn('Session error:', sessionError);
+        setMessage(`Error: ${sessionError.message}`);
+        setLoading(false);
+        return;
+      }
+
+      const email = session.user.email;  // Get email from session
+
+      const { error } = await supabase
+        .from('Users')
+        .upsert({
+          user_id: session.user.id,
+          email: email,
+          username: username,
+          bio: bio,
+          profile_picture: profilePicture,
+        });
+
+      if (error) throw error;
+
+      setMessage('Profile updated successfully!');
+    } catch (error) {
+      setMessage(`Error: ${error.message}`);
+    } finally {
       setLoading(false);
-      return;
     }
-
-    // Get email from session data
-    const email = session.user.email;
-
-    // Perform the upsert operation, including the email field
-    const { error } = await supabase
-      .from('Users')
-      .upsert({
-        user_id: session.user.id,
-        email: email, // Ensure the email is included here
-        username: username,
-        bio: bio,
-        profile_picture: profilePicture,
-      });
-
-    if (error) throw error;
-
-    setMessage('Profile updated successfully!');
-    // Re-fetch the updated profile data to refresh state
-  } catch (error) {
-    setMessage(`Error: ${error.message}`);
-  } finally {
-    setLoading(false);
-  }
-};
-
+  };
 
   return (
-    <div className={`flex min-h-screen flex-col ml-[100px] pt-4 overflow-hidden ${isToggled ? "bg-[#2D2E39]" : "bg-[#FFFFFF]"}`} >
-      <Sidebar />
+    <div className={`flex min-h-screen flex-col ml-[100px] pt-4 overflow-hidden bg-theme`}>
+      <Sidebar key={sidebarKey} /> {/* Force sidebar re-render when theme changes */}
       <div className="flex flex-1">
-        <div className={`flex flex-col w-4/12 pl-10 justify-start ${isToggled ? "text-white" : "text-black"}`}>
-          <h2 className="text-4xl font-bold mb-6 left-0">Settings</h2>
-          <h2 className="text-xl mb-4 ml-8">Basic Details</h2>
-          <h2 className="text-xl mb-2 ml-8 absolute top-3/4">Theme Settings</h2>
+        <div className="flex flex-col w-4/12 pl-10 justify-start text-theme">
+          <h2 className="text-4xl font-body mb-6 pt-6">Settings</h2>
+          <h2 className="text-xl mb-4 ml-8 font-body">Basic Details</h2>
+          <h2 className="text-xl mb-2 ml-8 absolute top-3/4 font-body">Theme Settings</h2>
         </div>
 
         <div className="flex flex-1 justify-end pr-20 mt-24">
@@ -143,7 +142,7 @@ const handleProfileUpdate = async (e) => {
             </div>
 
             <div className="mb-4">
-              <label htmlFor="profilePicture" className={`block text-sm font-medium mb-1 ${isToggled ? "text-white" : "text-black"}`}>
+              <label htmlFor="profilePicture" className="block text-sm font-medium mb-1">
                 Profile Picture URL
               </label>
               <input
@@ -151,12 +150,12 @@ const handleProfileUpdate = async (e) => {
                 type="url"
                 value={profilePicture}
                 onChange={(e) => setProfilePicture(e.target.value)}
-                className="h-10 w-full settings-input rounded-md px-3"
+                className={`h-10 w-full rounded-md px-3 text-theme accent`}
               />
             </div>
 
             <div className="mb-4">
-              <label htmlFor="username" className={`block text-sm font-medium mb-1 ${isToggled ? "text-white" : "text-black"}`}>
+              <label htmlFor="username" className="block text-sm font-medium mb-1 text-theme">
                 Username
               </label>
               <input
@@ -165,19 +164,19 @@ const handleProfileUpdate = async (e) => {
                 required
                 value={username}
                 onChange={(e) => setUsername(e.target.value)}
-                className="h-10 w-full settings-input rounded-md px-3"
+                className={`h-10 w-full rounded-md px-3 text-theme accent`}
               />
             </div>
 
-            <div className="mb-4 ">
-              <label htmlFor="bio" className={`block text-sm font-medium mb-1 ${isToggled ? "text-white" : "text-black"}`}>
+            <div className="mb-4">
+              <label htmlFor="bio" className="block text-sm font-medium mb-1 text-theme">
                 Bio
               </label>
               <textarea
                 id="bio"
                 value={bio}
                 onChange={(e) => setBio(e.target.value)}
-                className="h-24 w-full settings-input rounded-md px-3"
+                className={`h-24 w-full rounded-md px-3 py-2 text-theme accent`}
               />
             </div>
 
@@ -185,7 +184,7 @@ const handleProfileUpdate = async (e) => {
               <button
                 type="submit"
                 onClick={handleProfileUpdate}
-                className="px-4 py-2 saveprofile bg-blue-500 rounded-md "
+                className={`px-4 py-2 rounded-md text-theme accent font-body`}
                 disabled={loading}
               >
                 {loading ? 'Saving...' : 'Save Profile'}
@@ -193,21 +192,22 @@ const handleProfileUpdate = async (e) => {
             </div>
 
             {/* Toggle Switch */}
-            <div className='h-10 w-full relative top-[165px] settings-input rounded-md '>
-              <h2 className="flex pt-[5px] pl-[5px] items-center">
-                {isToggled ? (
-                  <FontAwesomeIcon icon={faMoon} className="mr-2" />
-                ) : (
-                  <FontAwesomeIcon icon={faSun} className="mr-2" />
-                )}
-                {isToggled ? 'Dark Mode' : 'Light Mode'}
-              </h2>
-              <Switch isToggled={isToggled} onToggled={handleThemeToggle} />
+            <div className={`h-10 font-body flex items-center justify-between p-6 w-full relative top-[165px] rounded-md ${isToggled ? "bg-[#25262F] text-white " : "bg-[#E4E4E4] text-black "} `}>
+            <h2 className="flex pl-[5px] items-center">
+              {isToggled ? (
+                <FontAwesomeIcon icon={faMoon} className="mr-2 transition-all ease-in-out duration-1000 text-blue-300 h-6 " />
+              ) : (
+                <FontAwesomeIcon icon={faSun} className="mr-2 transition-all ease-in-out duration-1000 text-yellow-500 h-6 " />
+              )}
+              {isToggled ? 'Dark Mode' : 'Light Mode'}
+            </h2>
+            <Switch isToggled={isToggled} onToggled={handleThemeToggle} />
             </div>
+            
           </div>
         </div>
       </div>
-      <div className="flex justify-center mt-4">
+      <div className="flex justify-center mt-4 mb-4">
         {message && <p className="text-green-500">{message}</p>}
       </div>
     </div>
@@ -215,3 +215,5 @@ const handleProfileUpdate = async (e) => {
 };
 
 export default SettingsPage;
+
+

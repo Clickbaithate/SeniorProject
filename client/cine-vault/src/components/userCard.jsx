@@ -2,7 +2,7 @@ import React from "react";
 import { useNavigate } from "react-router-dom";
 import placeholder from "../assets/placeholder.jpg"
 
-const UserCard = ({user, theme, index}) => {
+const UserCard = ({user, index}) => {
 
   const navigate = useNavigate();
 
