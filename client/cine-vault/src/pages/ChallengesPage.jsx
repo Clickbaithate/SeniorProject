@@ -2,23 +2,32 @@ import React, { useState } from 'react';
 import Sidebar from './Sidebar';
 import SearchBar from '../components/SearchBar';
 import "./theme.css";
+import ChallengeCard from '../components/ChallengeCard';
 
 const ChallengesPage = () => {
-  const [challenges, setChallenges] = useState([
-    { id: 1, name: 'Movie Buff Beginner', description: 'Watch 5 movies', progress: 3, total: 5 },
-    { id: 2, name: 'Cinema Enthusiast', description: 'Watch 10 movies', progress: 7, total: 10 },
-    { id: 3, name: 'Just a Quick Flick', description: 'Watch for 30 minutes', progress: 20, total: 30 },
-    { id: 4, name: 'Curator-in-Chief', description: 'Add 5 movies to your watchlist', progress: 5, total: 5 },
-    { id: 5, name: 'Binge Watch Pro', description: 'Watch 3 movies back-to-back', progress: 1, total: 3 },
-  ]);
 
-  const getProgressPercentage = (progress, total) => (progress / total) * 100;
+  const [challenges, setChallenges] = useState([
+    { id: 1, title: 'Top 100 Sci-Fi Movies', percentage: 75 },
+    { id: 2, title: 'Top 100 Comedy Movies', percentage: 25 },
+    { id: 3, title: 'Top 100 Action Movies', percentage: 50 },
+    { id: 4, title: 'Top 100 Animated Movies', percentage: 43 },
+    { id: 5, title: 'Top 100 Horror Movies', percentage: 12 },
+    { id: 6, title: 'Top 100 Romance Movies', percentage: 65 },
+    { id: 7, title: 'Top 100 Thriller Movies', percentage: 96 },
+    { id: 8, title: 'Top 100 Sports Movies', percentage: 29 },
+    { id: 9, title: 'Top 100 Oscar-Winning Movies', percentage: 100 },
+    { id: 10, title: 'Top 100 Documentaries', percentage: 5 },
+    { id: 11, title: 'Top 100 Christmas Movies', percentage: 45 },
+    { id: 12, title: 'Top 100 Family Movies', percentage: 50 },
+    { id: 13, title: 'Top 100 Superhero Movies', percentage: 98 },
+    { id: 14, title: "Top 100 90's Movies", percentage: 90 },
+    { id: 15, title: 'Top 100 Summer Movies', percentage: 10 }
+  ]);
 
   return (
     <div className="flex bg-theme">
       {/* Sidebar */}
       <Sidebar />
-
       <div className="ml-[100px] flex-1 px-4 ">
         {/* Page Title */}
         {challenges.length > 0 && (
@@ -27,35 +36,19 @@ const ChallengesPage = () => {
           </div>
         )}
 
+        <h1 className="text-4xl font-body ml-12 text-theme mb-8 " >Challenges</h1>
+
         {/* Challenges List */}
-        <div className="">
+        <div className="grid grid-cols-5 gap-6 ml-16 mt-6 ">
           {challenges.length > 0 ? (
-            challenges.map((challenge) => (
-              <div key={challenge.id} className="accent shadow-md rounded-lg p-4 mb-4">
-                <h3 className="text-lg font-semibold text-theme">{challenge.name}</h3>
-                <p className="text-theme mb-2">{challenge.description}</p>
-
-                {/* Progress Bar */}
-                <div className="bg-theme rounded-full h-2 mb-2" aria-label="Progress bar">
-                  <div
-                    className="bg-green-500 h-2 rounded-full"
-                    style={{ width: `${getProgressPercentage(challenge.progress, challenge.total)}%` }}
-                    role="progressbar"
-                    aria-valuenow={challenge.progress}
-                    aria-valuemin="0"
-                    aria-valuemax={challenge.total}
-                  />
-                </div>
-
-                <p className="text-sm text-theme">
-                  {challenge.progress}/{challenge.total} completed
-                </p>
-              </div>
+            challenges.map((challenge, i) => (
+              <ChallengeCard challenge={challenge} key={i} />
             ))
           ) : (
             <p>No challenges available.</p>
           )}
         </div>
+        <div className="h-10" />
       </div>
     </div>
   );

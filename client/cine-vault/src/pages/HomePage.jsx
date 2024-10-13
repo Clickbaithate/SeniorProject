@@ -4,7 +4,7 @@ import Sidebar from "./Sidebar";
 import SearchBar from "../components/SearchBar";
 import HomePageCarousel from "../components/HomePageCarousel";
 import './theme.css';
-import ChallengeCard from "../components/ChallengeCard";
+import HomeChallengeCard from "../components/MovieChallengeCard";
 import HomeMovieCard from "../components/HomeMovieCard";
 import SocialActivityCard from "../components/SocialActivityCard";
 import { useNavigate } from "react-router-dom";
@@ -99,9 +99,9 @@ const HomePage = () => {
                 ]}
               />
               <div className="flex space-x-12 " >
-                <ChallengeCard progress={75} challenge={"Sci-Fi"} />
-                <ChallengeCard progress={50} challenge={"Comedy"} />
-                <ChallengeCard progress={92} challenge={"Oscar-Nominated"} />
+                <HomeChallengeCard progress={75} challenge={"Sci-Fi"} />
+                <HomeChallengeCard progress={50} challenge={"Comedy"} />
+                <HomeChallengeCard progress={92} challenge={"Oscar-Nominated"} />
               </div>
           </div>
 
