@@ -5,6 +5,7 @@ import { useEffect, useState } from 'react';
 import supabase from '../config/supabaseClient';
 import { faSearch } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import "./theme.css";
 
 const popularPlaylists = [
   {
@@ -31,7 +32,6 @@ const popularPlaylists = [
 
 const PlaylistPage = () => {
 
-  const [theme, setTheme] = useState("light");
   const [searchText, setSearchText] = useState("");
   const [filterCount, setFilterCount] = useState(0);
 
@@ -74,7 +74,6 @@ const PlaylistPage = () => {
         if (error) {
         console.warn('Error fetching profile:', error);
         } else if (data) {
-        setTheme(data.theme_settings ? 'dark' : 'light');
         }
     }
 
@@ -91,32 +90,32 @@ const PlaylistPage = () => {
 
   return (
 
-    <div className={`min-h-screen ml-[100px] ${theme === "light" ? "bg-[#FFFFFF]" : "bg-[#2D2E39]" } `}>
+    <div className={`min-h-screen ml-[100px] bg-theme `}>
 
       <Sidebar></Sidebar>
       <SearchBar></SearchBar>
       {/* Page Title */}
-      <h1 className={`text-4xl font-body py-2 ml-12 ${theme === "light" ? "text-black" : "text-white"} `}>Movie Playlists</h1>
+      <h1 className={`text-4xl font-body py-2 ml-12  `}>Movie Playlists</h1>
       {/* Filters, etc */}
-      <div className={`flex items-center justify-end px-12 font-body ${theme === "light" ? "text-black" : "text-white"} `}>
+      <div className={`flex items-center justify-end px-12 font-body  `}>
         <div className="flex items-center justify-center space-x-4 " >
           {/* Filter Counter */}
-          <div className={`h-8 w-8 flex items-center justify-center rounded-full font-body shadow-[rgba(0,0,15,0.5)_10px_5px_4px_0px] ${theme === "light" ? "bg-[#E4E4E4] text-black" : "bg-[#25262F] text-white "} `} >
+          <div className={`h-8 w-8 flex items-center justify-center border rounded-full font-body shadow-[rgba(0,0,15,0.5)_10px_5px_4px_0px]  `} >
             {filterCount}
           </div>
           {/* Filter Button */}
-          <div onClick={handleFilter} className={`font-body cursor-pointer w-18 h-10 p-4 flex items-center justify-center rounded-lg shadow-[rgba(0,0,15,0.5)_10px_5px_4px_0px] ${theme === "light" ? "bg-[#E4E4E4] text-black" : "bg-[#25262F] text-white "} `} >
+          <div onClick={handleFilter} className={`font-body cursor-pointer border w-18 h-10 p-4 flex items-center justify-center rounded-lg shadow-[rgba(0,0,15,0.5)_10px_5px_4px_0px]  `} >
             Add Filter
           </div>
           {/* Filter Search */}
-          <form onSubmit={handleSearch} className={`flex items-center rounded-lg p-2 w-64 shadow-[rgba(0,0,15,0.5)_10px_5px_4px_0px] ${theme === "light" ? "bg-[#E4E4E4]" : "bg-[#25262F]"} `}>
+          <form onSubmit={handleSearch} className={`flex border items-center rounded-lg p-2 w-64 shadow-[rgba(0,0,15,0.5)_10px_5px_4px_0px] `}>
             <button type="button" onClick={handleSearch} className="mr-2">
               <FontAwesomeIcon icon={faSearch} className="text-gray-500" />
             </button>
             <input
               type="text"
               placeholder="Search your playlists..."
-              className={`w-full focus:outline-none bg-transparent font-body ${theme === "light" ? "text-black" : "text-white"} `}
+              className={`w-full focus:outline-none bg-transparent font-body `}
               value={searchText}
               onChange={(e) => setSearchText(e.target.value)}
             />
@@ -125,13 +124,13 @@ const PlaylistPage = () => {
         </div>
       </div>
 
-      <h1 className={`font-body ml-20 pt-8 ${theme === "light" ? "text-black" : "text-white"}`} >Popular Playlists</h1>
+      <h1 className={`font-body ml-20 pt-8 `} >Popular Playlists</h1>
 
-      <div className="flex cursor-pointer items-center justify-start ml-20 space-x-10 overflow-x-auto py-8 scrollbar-thin scrollbar-track-[#25262F] scrollbar-thumb-[#2D2E39] scrollbar-corner-yellow-500">
+      <div className="flex cursor-pointer items-center justify-start ml-20 space-x-10 overflow-x-auto py-8 scrollbar-thin scrollbar-track-[#FFFFFF] scrollbar-thumb-[#2D2E39] scrollbar-corner-yellow-500">
         {popularPlaylists.map((playlist, index) => (
           <div onClick={() => handlePlaylistClick(playlist.title)} key={index} className="min-w-96 max-w-96">
             <div className="h-56 rounded-2xl flex-shrink-0" style={{ background: `url(${playlist.image})`, backgroundSize: "cover", backgroundPosition: "center" }} />
-            <p className={`mt-2 font-body text-center ${theme === "light" ? "text-black" : "text-white"}`}>{playlist.title}</p>
+            <p className={`mt-2 font-body text-center `}>{playlist.title}</p>
           </div>
         ))}
       </div>

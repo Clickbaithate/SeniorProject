@@ -3,12 +3,11 @@ import supabase from '../config/supabaseClient';
 import Sidebar from './Sidebar';
 import SearchBar from '../components/SearchBar.jsx';
 import VerticalList from '../components/VerticalList.jsx';
-import "../App.css";
+import "./theme.css";
 
 const WatchedPage = () => {
-    const [movies, setMovies] = useState([]);
 
-    const [theme, setTheme] = useState(localStorage.getItem('theme') || 'light');
+    const [movies, setMovies] = useState([]);
     const [user, setUser] = useState(null);
     const [watchedMovies, setWatchedMovies] = useState([]);
 
@@ -44,7 +43,6 @@ const WatchedPage = () => {
                         console.warn('Error fetching profile:', userError);
                     } else if (userData) {
                         setUser(userData);
-                        setTheme(userData.theme_settings ? 'dark' : 'light');
                     }
 
                     const { data: moviesData, error: moviesError } = await supabase
@@ -68,31 +66,31 @@ const WatchedPage = () => {
     }, []);
 
     return (
-        <div className={`ml-[100px] min-h-screen ${theme === "light" ? "bg-[#FFFFFF]" : "bg-[#2D2E39]"}`}>
+        <div className={`ml-[100px] min-h-screen bg-theme `}>
             <Sidebar />
             <div>
                 <div>
-                    <SearchBar placeholder="SEARCH..." theme={theme} />
+                    <SearchBar placeholder="SEARCH..." />
                 </div>
-                <h1 className={`text-lg font-bold ml-8 ${theme === "light" ? "text-black" : "text-white"}`}>Watched Page</h1>
+                <h1 className={`text-lg font-bold ml-8 `}>Watched Page</h1>
                 
                 <div className="ml-8 mt-4">
                     {watchedMovies.length > 0 ? (
                         <ul className="space-y-4">
                             {watchedMovies.map((movie, index) => (
-                                <li key={index} className={`text-md ${theme === 'light' ? 'text-black' : 'text-white'}`}>
+                                <li key={index} className={`text-md `}>
                                     Movie ID: {movie.movie_id}
                                 </li>
                             ))}
                         </ul>
                     ) : (
-                        <p className={`text-md ${theme === 'light' ? 'text-black' : 'text-white'}`}>
+                        <p className={`text-md `}>
                             {/* No movies watched yet. */}
                         </p>
                     )}
                 </div>
 
-                <VerticalList movies={movies} theme={theme} />
+                <VerticalList movies={movies} />
 
             </div>
         </div>

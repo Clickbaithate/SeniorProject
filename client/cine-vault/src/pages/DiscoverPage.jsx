@@ -233,28 +233,28 @@ const DiscoverPage = () => {
     const images = [];
 
     return (
-        <div className={`ml-[100px] min-h-screen ${theme === "light" ? "bg-[#FFFFFF]" : "bg-[#2D2E39]"} `}>
+        <div className={`ml-[100px] min-h-screen `}>
             <Sidebar />
-            <SearchBar placeholder="SEARCH..." theme={theme} />
+            <SearchBar placeholder="SEARCH..." />
             <DiscoverCarousel movies={[
                 {image: "https://4kwallpapers.com/images/wallpapers/oppenheimer-8k-2023-3840x1080-12220.jpg", movie_id: 872585},
                 {image: "https://image.tmdb.org/t/p/original/ss0Os3uWJfQAENILHZUdX8Tt1OC.jpg", movie_id: 545611}, 
                 {image: "https://images8.alphacoders.com/129/1297243.png", movie_id: 315162}
             ]} />
 
-            <HorizontalList genres={genres} theme={theme} />
+            <HorizontalList genres={genres} />
 
-            <h1 className={`ml-[50px] mt-4 font-body text-3xl ${theme === "light" ? "text-black" : "text-white"}`}>Trending Movies</h1>
-            {trendingMovies ? <HorizontalList movies={trendingMovies} theme={theme} /> : <h1>Loading</h1>}
+            <h1 className={`ml-[50px] mt-4 font-body text-3xl text-theme`}>Trending Movies</h1>
+            {trendingMovies ? <HorizontalList movies={trendingMovies} /> : <h1>Loading</h1>}
 
-            <h1 className={`ml-[50px] mt-4 font-body text-3xl ${theme === "light" ? "text-black" : "text-white"}`}>Popular Movies</h1>
-            {popularMovies ? <HorizontalList movies={popularMovies} theme={theme} /> : <h1>Loading</h1>}
+            <h1 className={`ml-[50px] mt-4 font-body text-3xl text-theme`}>Popular Movies</h1>
+            {popularMovies ? <HorizontalList movies={popularMovies} /> : <h1>Loading</h1>}
 
-            <h1 className={`ml-[50px] mt-4 font-body text-3xl ${theme === "light" ? "text-black" : "text-white"}`}>Trending Shows</h1>
-            {trendingShows ? <HorizontalList movies={trendingShows} theme={theme} /> : <h1>Loading</h1>}
+            <h1 className={`ml-[50px] mt-4 font-body text-3xl text-theme`}>Trending Shows</h1>
+            {trendingShows ? <HorizontalList movies={trendingShows} /> : <h1>Loading</h1>}
 
-            <h1 className={`ml-[50px] mt-4 font-body text-3xl ${theme === "light" ? "text-black" : "text-white"}`}>Popular Shows</h1>
-            {popularShows ? <HorizontalList movies={popularShows} theme={theme} /> : <h1>Loading</h1>}
+            <h1 className={`ml-[50px] mt-4 font-body text-3xl text-theme`}>Popular Shows</h1>
+            {popularShows ? <HorizontalList movies={popularShows} /> : <h1>Loading</h1>}
 
             <div className="h-12" />
         </div>

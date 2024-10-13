@@ -1,14 +1,11 @@
 import React, { useEffect, useState } from 'react';
 import supabase from '../config/supabaseClient';
 import Sidebar from './Sidebar';
+import "./theme.css";
 
 const FriendsPage = () => {
 
-  const [theme, setTheme] = useState('light');
   const [user, setUser] = useState(null);
-  const [isToggled, setIsToggled] = useState(
-    localStorage.getItem('theme') === 'dark'
-  );
 
   // fetching user data
   useEffect(() => {
@@ -33,21 +30,12 @@ const FriendsPage = () => {
         } else if (data) {
           setUser(data);
           console.log(data.profile_picture);
-          setIsToggled(data.theme_settings);
-          setTheme(data.theme_settings ? 'dark' : 'light');
         }
       }
     };
 
     fetchProfile();
   }, []);
-
-  // so sidebar theme matches since it uses plain css
-  useEffect(() => {
-    const theme = isToggled ? 'dark' : 'light';
-    document.documentElement.setAttribute('data-theme', theme);
-    localStorage.setItem('theme', theme); 
-  }, [isToggled]);
 
   // mock data
   const messages = [
@@ -95,32 +83,44 @@ const FriendsPage = () => {
     { id: 19, sender: 'Mia', text: "Can you help me with this project? I'm stuck.", pfp: 'https://wallpapers-clan.com/wp-content/uploads/2022/12/deadpool-pfp-1.jpg' },
     { id: 20, sender: 'Jack', text: "Sure, I'll walk you through it. Let's schedule a call.", pfp: 'https://c4.wallpaperflare.com/wallpaper/105/575/743/comics-nova-marvel-comics-nova-marvel-comics-wallpaper-preview.jpg' },
   ];
+
+  useEffect(() => {
+    // Check for a stored theme preference in local storage
+    const savedTheme = localStorage.getItem('theme');
+
+    // Set the theme to light mode if no preference is found
+    if (!savedTheme) {
+      document.documentElement.setAttribute('data-theme', 'light');
+    } else {
+      document.documentElement.setAttribute('data-theme', savedTheme);
+    }
+  }, []);
   
 
   return (
-    <div className={`max-h-screen ${theme === 'light' ? 'bg-[#FFFFFF]' : 'bg-[#2D2E39]'} flex`}>
+    <div className={`max-h-screen flex bg-theme `}>
       {/* Sidebar */}
       <Sidebar />
-      <div className={`w-1/4 ${theme === 'light' ? 'bg-[#FFFFFF]' : 'bg-[#25262F]'} ml-[100px]`}>
+      <div className={`w-1/4  ml-[100px] accent `}>
         {/* Sidebar Header */}
-        <header className={`p-4 flex items-center ${theme === 'light' ? 'bg-[#E4E4E4]' : 'bg-[#25262F]'}`}>
+        <header className={`p-4 flex items-center `}>
           <input
             type="text"
-            placeholder="Search messages..."
-            className={`w-full p-2 rounded-md border border-black border-1 shadow-xl focus:outline-none focus:border-blue-500 ${theme === 'light' ? 'bg-[#E4E4E4] text-black' : 'bg-[#2D2E39] text-white'}`}
+            placeholder="Search friends..."
+            className={`w-full p-2 rounded-md border-opacity-50 border-2 bg-theme text-theme border-black shadow-xl focus:outline-none `}
           />
         </header>
         
         {/* Contact List */}
-        <div className={`${theme === 'light' ? 'bg-[#E4E4E4]' : 'bg-[#25262F]'} overflow-y-auto h-[calc(100vh-75px)]`} style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}>
+        <div className={` overflow-y-auto h-[calc(100vh-75px)]`} style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}>
           {contacts.map((contact) => (
-            <div className={`flex items-center mb-4 cursor-pointer ${theme === 'light' ? 'hover:bg-[#E4E4E4]' : "hover:bg-[#3c3f54]"} p-2 rounded-md`} key={contact.id}>
-              <div className="w-12 h-12 bg-gray-300 rounded-full mr-3">
+            <div className={`flex items-center mb-4 cursor-pointer  p-2 rounded-md`} key={contact.id}>
+              <div className="w-12 h-12 rounded-full mr-3">
                 <img src={contact.pfp || `https://placehold.co/200x/ffa8e4/ffffff.svg?text=${contact.sender[0]}`} alt="User Avatar" className="w-12 h-12 rounded-full object-cover" />
               </div>
               <div className="flex-1 min-w-0"> {/* Ensures it can shrink to fit without overflowing */}
-                <h2 className={`text-lg font-semibold ${theme === 'light' ? 'text-black' : 'text-white'}`}>{contact.sender}</h2>
-                <p className={`pr-6 text-gray-600 ${theme === 'light' ? 'text-black' : 'text-white'} overflow-hidden whitespace-nowrap overflow-ellipsis`} style={{ maxHeight: '1.2em', lineHeight: '1.2em' }}>
+                <h2 className={`text-lg font-semibold text-theme `}>{contact.sender}</h2>
+                <p className={`pr-6 text-theme overflow-hidden whitespace-nowrap overflow-ellipsis`} style={{ maxHeight: '1.2em', lineHeight: '1.2em' }}>
                   {contact.text}
                 </p>
               </div>
@@ -130,9 +130,9 @@ const FriendsPage = () => {
       </div>
 
       {/* Main Chat Area */}
-      <div className="flex-1 flex flex-col">
+      <div className="flex-1 flex flex-col ">
         {/* Chat Header */}
-        <header className={`${theme === 'light' ? 'bg-[#E4E4E4]' : 'bg-[#25262F]'} p-4 flex items-center`}>
+        <header className={`accent p-4 flex items-center`}>
           {/* Profile Picture */}
           <div className="w-10 h-10 rounded-full overflow-hidden mr-3">
             <img 
@@ -141,7 +141,7 @@ const FriendsPage = () => {
               className="w-full h-full object-cover" 
             />
           </div>
-          <h1 className={`text-2xl font-semibold ${theme === 'light' ? 'text-black' : 'text-white'}`}>Peter Parker</h1>
+          <h1 className={`text-2xl font-semibold `}>Peter Parker</h1>
         </header>
 
         {/* Chat Messages */}
@@ -149,12 +149,12 @@ const FriendsPage = () => {
           {messages.map((msg) => (
             <div key={msg.id} className={`flex mb-4 cursor-pointer ${msg.isOutgoing ? 'justify-end' : ''}`}>
               {!msg.isOutgoing && (
-                <div className="w-9 h-9 rounded-full flex items-center justify-center mr-2">
+                <div className="w-9 h-9 rounded-full flex items-center justify-center mr-2 ">
                   <img src="https://p16-va.lemon8cdn.com/tos-maliva-v-ac5634-us/ok1rSbbAiUcl9DuAP4BXiA7JiY4jAIgEQZBA7~tplv-tej9nj120t-origin.webp" alt="User Avatar" className="w-8 h-8 rounded-full" />
                 </div>
               )}
-              <div className={`flex max-w-96 ${msg.isOutgoing ? (theme === 'light' ? 'bg-[#E4E4E4] rounded-tr-3xl rounded-tl-3xl rounded-bl-3xl ' : 'bg-[#25262F] rounded-tr-3xl rounded-tl-3xl rounded-bl-3xl') : (theme === 'light' ? 'bg-[#E4E4E4] rounded-tr-3xl rounded-tl-3xl rounded-br-3xl' : 'bg-[#25262F] rounded-tr-3xl rounded-tl-3xl rounded-br-3xl')} p-3 gap-3`}>
-                <p className={`${msg.isOutgoing ? (theme === 'light' ? 'text-black' : 'text-white') : (theme === 'light' ? 'text-black' : 'text-white')}`}>{msg.text}</p>
+              <div className={`flex max-w-96  p-3 gap-3`}>
+                <p className={`accent p-2 rounded-lg`}>{msg.text}</p>
               </div>
               {msg.isOutgoing && (
                 <div className="w-9 h-9 rounded-full flex items-center justify-center ml-2">
@@ -166,10 +166,10 @@ const FriendsPage = () => {
         </div>
         
         {/* Chat Input */}
-        <footer className={`${theme === 'light' ? 'bg-[#E4E4E4]' : 'bg-[#25262F]'} p-4`}>
-          <div className="flex items-center">
-            <input type="text" placeholder="Type a message..." className={` ${theme === 'light' ? "bg-[#FFFFFF] border-black" : "bg-[#3c3f54] border-black"} text-black w-full p-2 rounded-md border-2 focus:outline-none focus:border-blue-500`} />
-            <button className={`px-4 py-2 rounded-md ml-2 ${theme === 'light' ? 'bg-[#FFFFFF] text-black' : 'bg-[#3c3f54] text-white'}`}>Send</button>
+        <footer className={`accent p-4`}>
+          <div className="flex items-center ">
+            <input type="text" placeholder="Type a message..." className={` shadow-[rgba(0,0,15,0.5)_5px_5px_4px_0px] text-theme accent w-full p-2 rounded-md border-2 border-opacity-25 border-black focus:outline-none `} />
+            <button className={`px-4 py-2 rounded-md ml-2 bg-theme transform hover:scale-105 `}>Send</button>
           </div>
         </footer>
       </div>

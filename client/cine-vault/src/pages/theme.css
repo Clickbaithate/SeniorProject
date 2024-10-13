@@ -1,0 +1,19 @@
+.bg-theme {
+  background-color: var(--background-color);
+}
+
+.accent {
+  background-color: var(--background-accent);
+}
+
+.indicator {
+  background-color: var(--indicator);
+}
+
+.accent-border {
+  border-color: var(--background-accent);
+}
+
+.text-theme {
+  color: var(--text-color);
+}
