@@ -21,7 +21,7 @@ const Sidebar = () => {
     '/discover': 1,
     '/watched': 2,
     '/playlists': 3,
-    '/friendsPage': 4,
+    '/friends': 4,
     '/challenges': 5,
     '/settings': 6,
   };
@@ -141,7 +141,7 @@ const Sidebar = () => {
               <div className="space-y-2" >
                 {/* Friends and Challenges Icons */}
                 <li>
-                  <NavLink className={`text-theme`} to="/friendsPage">
+                  <NavLink className={`text-theme`} to="/friends">
                     <FontAwesomeIcon icon={faUserGroup} />
                   </NavLink>
                 </li>
