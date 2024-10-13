@@ -1,5 +1,7 @@
 import React from 'react';
 
+// adding this comment to push link image loading fixes to main
+
 const MovieCategories = () => {
   const categories = [
     {
