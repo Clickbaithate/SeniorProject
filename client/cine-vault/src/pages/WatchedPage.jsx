@@ -3,13 +3,31 @@ import supabase from '../config/supabaseClient';
 import Sidebar from './Sidebar';
 import SearchBar from '../components/SearchBar.jsx';
 import VerticalList from '../components/VerticalList.jsx';
-import "./theme.css";
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faSearch } from '@fortawesome/free-solid-svg-icons';
 
 const WatchedPage = () => {
+    const [movies, setMovies] = useState([]); // Stores the initial 11 movies
+    const [filteredMovies, setFilteredMovies] = useState([]); // Stores the filtered movies
+    const [filterCount, setFilterCount] = useState(0);
+    const [searchText, setSearchText] = useState('');
 
-    const [movies, setMovies] = useState([]);
-    const [user, setUser] = useState(null);
-    const [watchedMovies, setWatchedMovies] = useState([]);
+    const handleSearch = (e) => {
+        e.preventDefault();
+        handleFilter();
+    };
+
+    const handleFilter = () => {
+        const filtered = movies.filter((movie) =>
+            movie.title.toLowerCase().includes(searchText.toLowerCase())
+        );
+        setFilteredMovies(filtered);
+        incrementFilterCount();
+    };
+
+    const incrementFilterCount = () => {
+        setFilterCount((prevCount) => prevCount + 1);
+    };
 
     useEffect(() => {
         const fetchMoviesAndProfile = async () => {
@@ -24,39 +42,7 @@ const WatchedPage = () => {
                     console.error('Error fetching movies:', error);
                 } else {
                     setMovies(data);
-                }
-
-                const { data: { session }, error: sessionError } = await supabase.auth.getSession();
-
-                if (sessionError) {
-                    console.warn(sessionError);
-                    return;
-                }
-
-                if (session) {
-                    const { data: userData, error: userError } = await supabase
-                        .from('Users')
-                        .select()
-                        .eq('user_id', session.user.id)
-                        .single();
-            
-                    if (userError) {
-                        console.warn('Error fetching profile:', userError);
-                    } else if (userData) {
-                        setUser(userData);
-                    }
-
-                    const { data: moviesData, error: moviesError } = await supabase
-                        .from('Watched_Movies')
-                        .select('movie_id')
-                        .eq('user_id', session.user.id);
-
-                    if (moviesError) {
-                        console.warn('Error fetching watched movies:', moviesError);
-                    } else {
-                        const watchedMovieIds = moviesData.map((movie) => movie.movie_id);
-                        setWatchedMovies(watchedMovieIds); 
-                    }
+                    setFilteredMovies(data);
                 }
             } catch (error) {
                 console.error('Error fetching data:', error);
@@ -67,32 +53,51 @@ const WatchedPage = () => {
     }, []);
 
     return (
-        <div className={`ml-[100px] min-h-screen bg-theme `}>
+        <div className={`ml-[100px] min-h-screen bg-theme`}>
             <Sidebar />
             <div>
-                <div>
-                    <SearchBar placeholder="SEARCH..." />
+                <SearchBar placeholder="SEARCH..." />
+                <h1 className={`text-lg font-bold ml-8`}>Watched Page</h1>
+
+                <div className={`flex items-center justify-end px-12 font-body`}>
+                    <div className="flex items-center justify-center space-x-4">
+                        <div className="h-8 w-8 flex items-center justify-center border rounded-full shadow-md">
+                            {filterCount}
+                        </div>
+                        <div
+                            onClick={handleFilter}
+                            className="cursor-pointer border w-18 h-10 p-4 flex items-center justify-center rounded-lg shadow-md"
+                        >
+                            Add Filter
+                        </div>
+                        <form
+                            onSubmit={handleSearch}
+                            className="flex border items-center rounded-lg p-2 w-64 shadow-md"
+                        >
+                            <button type="submit" className="mr-2">
+                                <FontAwesomeIcon icon={faSearch} className="text-gray-500" />
+                            </button>
+                            <input
+                                type="text"
+                                placeholder="Search your movies..."
+                                className="w-full focus:outline-none bg-transparent"
+                                value={searchText}
+                                onChange={(e) => setSearchText(e.target.value)}
+                            />
+                        </form>
+                    </div>
                 </div>
-                <h1 className={`text-lg font-bold ml-8 `}>Watched Page</h1>
-                
+
                 <div className="ml-8 mt-4">
-                    {watchedMovies.length > 0 ? (
-                        <ul className="space-y-4">
-                            {watchedMovies.map((movie, index) => (
-                                <li key={index} className={`text-md `}>
-                                    Movie ID: {movie.movie_id}
-                                </li>
-                            ))}
+                    {filteredMovies.length > 0 ? (
+                        <ul className="grid grid-cols-2 gap-4 md:grid-cols-3 lg:grid-cols-4">
                         </ul>
                     ) : (
-                        <p className={`text-md `}>
-                            {/* No movies watched yet. */}
-                        </p>
+                        <p className="text-md">No movies matched your filter.</p>
                     )}
                 </div>
 
-                <VerticalList movies={movies} />
-
+                <VerticalList movies={filteredMovies} />
             </div>
         </div>
     );
