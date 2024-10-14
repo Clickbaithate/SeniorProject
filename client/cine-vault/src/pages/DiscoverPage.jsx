@@ -4,6 +4,7 @@ import Sidebar from './Sidebar';
 import SearchBar from '../components/SearchBar';
 import DiscoverCarousel from '../components/DiscoverCarousel';
 import HorizontalList from '../components/HorizontalList';
+import { DotLottieReact } from '@lottiefiles/dotlottie-react';
 
 import { 
   faBomb, faDog, faFaceGrinTears, faFootball, 
@@ -245,16 +246,48 @@ const DiscoverPage = () => {
             <HorizontalList genres={genres} />
 
             <h1 className={`ml-[50px] mt-4 font-body text-3xl text-theme`}>Trending Movies</h1>
-            {trendingMovies ? <HorizontalList movies={trendingMovies} /> : <h1>Loading</h1>}
+            {
+                trendingMovies 
+                ? 
+                <HorizontalList movies={trendingMovies} /> 
+                : 
+                <div className=" flex flex-col justify-center items-center" >
+                    <DotLottieReact src="https://lottie.host/beb1704b-b661-4d4c-b60d-1ce309d639d5/7b3aX5rJYc.json" loop autoplay className="w-12 h-12" />
+                </div>
+            }
 
             <h1 className={`ml-[50px] mt-4 font-body text-3xl text-theme`}>Popular Movies</h1>
-            {popularMovies ? <HorizontalList movies={popularMovies} /> : <h1>Loading</h1>}
+            {
+                popularMovies 
+                ? 
+                <HorizontalList movies={popularMovies} /> 
+                : 
+                <div className=" flex flex-col justify-center items-center" >
+                    <DotLottieReact src="https://lottie.host/beb1704b-b661-4d4c-b60d-1ce309d639d5/7b3aX5rJYc.json" loop autoplay className="w-12 h-12" />
+                </div>
+            }
 
             <h1 className={`ml-[50px] mt-4 font-body text-3xl text-theme`}>Trending Shows</h1>
-            {trendingShows ? <HorizontalList movies={trendingShows} /> : <h1>Loading</h1>}
+            {
+                trendingShows 
+                ? 
+                <HorizontalList movies={trendingShows} /> 
+                : 
+                <div className=" flex flex-col justify-center items-center" >
+                    <DotLottieReact src="https://lottie.host/beb1704b-b661-4d4c-b60d-1ce309d639d5/7b3aX5rJYc.json" loop autoplay className="w-12 h-12" />
+                </div>
+            }
 
             <h1 className={`ml-[50px] mt-4 font-body text-3xl text-theme`}>Popular Shows</h1>
-            {popularShows ? <HorizontalList movies={popularShows} /> : <h1>Loading</h1>}
+            {
+                popularShows 
+                ? 
+                <HorizontalList movies={popularShows} /> 
+                : 
+                <div className=" flex flex-col justify-center items-center" >
+                    <DotLottieReact src="https://lottie.host/beb1704b-b661-4d4c-b60d-1ce309d639d5/7b3aX5rJYc.json" loop autoplay className="w-12 h-12" />
+                </div>
+            }
 
             <div className="h-12" />
         </div>
