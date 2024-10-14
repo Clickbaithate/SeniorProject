@@ -17,6 +17,7 @@ import MovieCategories from './pages/GenrePage.jsx';
 import MoviePage from './pages/moviePage.jsx';
 import SearchPage from './pages/SearchPage.jsx';
 import WatchedPage from './pages/WatchedPage.jsx';
+import Challenge from './pages/Challenge.jsx';
 
 function App() {
   const [session, setSession] = useState(null);
@@ -68,6 +69,7 @@ function App() {
         
         {/*i am testing my push - marcus*/}
         <Route path="/challenges" element={session ? <ChallengesPage /> : <Navigate to="/" />} />
+        <Route path="/challenges/:id" element={session ? <Challenge /> : <Navigate to="/" />} />
         <Route path="/playlists" element={session ? <PlaylistsPage /> : <Navigate to="/" />} />
         <Route path="/categories" element={session ? <MovieCategories /> : <Navigate to="/" />} />
         <Route path="/watched" element={session ? <WatchedPage /> : <Navigate to="/" />} />

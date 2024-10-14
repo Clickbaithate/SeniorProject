@@ -1,4 +1,5 @@
 import React from "react";
+import { useNavigate } from "react-router-dom";
 import lightsaber from "../assets/lightsaber.png";
 import comedy from "../assets/comedy.png";
 import oscar from "../assets/oscar.png";
@@ -19,6 +20,7 @@ const ChallengeCard = ({ challenge }) => {
 
   let asset;
   let color;
+  const navigate = useNavigate();
 
   if (challenge.title.includes("Sci-Fi")) {
     asset = lightsaber;
@@ -67,17 +69,17 @@ const ChallengeCard = ({ challenge }) => {
     color = "bg-indigo-500";
   }
 
-  const onClick = (challenge) => {
-    console.log(`ID: ${challenge.id}`);
+  const onClick = (id) => {
+    navigate(`/challenges/${id}`);
   }
 
   return (
-    <div onClick={() => onClick(challenge)} className="w-56 h-64 accent flex flex-col justify-around items-center rounded-3xl shadow-[rgba(0,0,15,0.5)_10px_5px_4px_0px] hover:scale-110 duration-500 cursor-pointer" >
+    <div onClick={() => onClick(challenge.challenge_id)} className="w-56 h-64 accent flex flex-col justify-around items-center rounded-3xl shadow-[rgba(0,0,15,0.5)_10px_5px_4px_0px] hover:scale-110 duration-500 cursor-pointer" >
       <h1 className="font-body text-theme text-center px-4 " >{challenge.title}</h1>
       <img src={asset} className="w-24 h-24" />
       <div className="w-[90%] h-2 bg-gray-300 rounded-full" >
-        <div className={`h-full ${color} rounded-full flex items-end justify-start`} style={{ width: `${challenge.percentage}%` }} >
-          <div className="mb-2 ml-2 font-body text-theme " >{challenge.percentage}%</div>
+        <div className={`h-full ${color} rounded-full flex items-end justify-start`} style={{ width: `${challenge.percent}%` }} >
+          <div className="mb-2 ml-2 font-body text-theme " >{challenge.percent}%</div>
         </div>
       </div>
     </div>
