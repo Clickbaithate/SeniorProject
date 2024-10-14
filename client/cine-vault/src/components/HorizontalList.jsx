@@ -2,8 +2,9 @@ import React, { useRef } from 'react';
 import MovieCard from './movieCard';
 import GenreCard from './genreCard';
 import UserCard from './userCard';
+import PlaylistCard from './PlaylistCard';
 
-const HorizontalList = ({ movies, genres, users }) => {
+const HorizontalList = ({ movies, genres, users, playlists }) => {
 
   const scrollRef = useRef(null); 
 
@@ -43,24 +44,32 @@ const HorizontalList = ({ movies, genres, users }) => {
       </button>
 
       {/* List */}
-      <div ref={scrollRef} className={`flex space-x-4 overflow-x-auto scrollbar-none py-4 px-4`} >
+      <div ref={scrollRef} className={`flex space-x-4 overflow-x-auto scrollbar-none px-4 ${playlists ? "pb-12 pt-2" : "py-4"} `} >
         {/* Movie */}
         {
-          movies ? (
-            movies.map((movie, index) => (
-              <MovieCard movie={movie} index={index} key={index} />
-            ))
-          ) : (
-            genres ? 
+          movies 
+          ? 
+          (movies.map((movie, index) => (
+            <MovieCard movie={movie} index={index} key={index} />
+          ))) 
+          : 
+          (genres 
+            ? 
+            (genres.map((genre, index) => (
+              <GenreCard genre={genre} index={index} key={index} />
+            )))
+            :
             (
-              genres.map((genre, index) => (
-                <GenreCard genre={genre} index={index} key={index} />
+              users 
+              ?
+              users.map((user, index) => (
+                <UserCard user={user} index={index} key={index} />
+              ))
+              :
+              playlists.map((playlist, index) => (
+                <PlaylistCard playlist={playlist} key={index} />
               ))
             )
-            :
-            users.map((user, index) => (
-              <UserCard user={user} index={index} key={index} />
-            ))
           )
         }
 
