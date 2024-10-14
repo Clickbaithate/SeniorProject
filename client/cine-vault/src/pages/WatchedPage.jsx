@@ -17,7 +17,8 @@ const WatchedPage = () => {
                 const { data, error } = await supabase
                     .from('Movies')
                     .select('movie_id, title, image, genres')
-                    .limit(11);
+                    .in('movie_id', [214, 24, 2, 100, 500, 248, 420634, 129, 533535, 105, 103, 101, 201, 203, 204, 300, 301, 306, 408, 400])
+                    .limit(25);
 
                 if (error) {
                     console.error('Error fetching movies:', error);

@@ -6,28 +6,36 @@ import supabase from '../config/supabaseClient';
 import { faSearch } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import "./theme.css";
+import HorizontalList from '../components/HorizontalList';
+import PlaylistCard from '../components/PlaylistCard';
+import create from "../assets/create.jpg";
 
 const popularPlaylists = [
   {
+    id: 1, 
     image: "https://static.displate.com/1200x857/displate/2023-02-20/ce0823168185db6a7d1285bb195e2e8c_44f10645b8dea479c868ff4057d55105.jpg",
     title: "Everything Marvel"
   },
   {
+    id: 2, 
     image: "https://pbs.twimg.com/media/FvnRS1tXwAMZTN-.jpg",
     title: "Christopher Nolan Movies"
   },
   {
+    id: 3,
     image: "https://cdna.artstation.com/p/assets/images/images/003/205/438/large/anderson-vieira-banner-starwars.jpg?1471027030",
     title: "Star Wars Saga"
   },
   {
+    id: 4,
     image: "https://i.pinimg.com/736x/99/9f/03/999f03d2cf0fdf405dcb2d6e6641a0ad.jpg",
     title: "Horror Films"
   },
   {
+    id: 5,
     image: "https://static.vecteezy.com/system/resources/previews/001/821/684/non_2x/christmas-banner-for-present-product-with-christmas-tree-on-red-background-text-merry-christmas-and-happy-new-year-free-vector.jpg",
     title: "Christmas Vibes"
-  }
+  },
 ];
 
 const PlaylistPage = () => {
@@ -124,16 +132,32 @@ const PlaylistPage = () => {
         </div>
       </div>
 
-      <h1 className={`font-body ml-20 pt-8 `} >Popular Playlists</h1>
+      <h1 className={`font-body ml-16 pt-8 text-xl `} >Popular Playlists</h1>
 
-      <div className="flex cursor-pointer items-center justify-start ml-20 space-x-10 overflow-x-auto py-8 scrollbar-thin scrollbar-track-[#FFFFFF] scrollbar-thumb-[#2D2E39] scrollbar-corner-yellow-500">
+      <HorizontalList playlists={popularPlaylists} />
+
+      <h1 className={`font-body ml-16 pt-8 pb-8 text-xl `} >Your Playlists</h1>
+
+      <div className="grid grid-cols-4 gap-y-16 ml-16 pr-6 ">
+        
+        <div
+        className="transition-all ease-in-out duration-500 transform hover:scale-105 w-[350px] h-56 bg-transparent flex-shrink-0 cursor-pointer"
+      >
+        <img
+          src={create}
+          className="w-full h-full object-fit mb-2 rounded-2xl"
+        />
+        <h2 className="text-md truncate mx-2 font-body font-semibold text-theme">
+          Create New Playlist
+        </h2>
+      </div>
+
         {popularPlaylists.map((playlist, index) => (
-          <div onClick={() => handlePlaylistClick(playlist.title)} key={index} className="min-w-96 max-w-96">
-            <div className="h-56 rounded-2xl flex-shrink-0" style={{ background: `url(${playlist.image})`, backgroundSize: "cover", backgroundPosition: "center" }} />
-            <p className={`mt-2 font-body text-center `}>{playlist.title}</p>
-          </div>
+          <PlaylistCard playlist={playlist} />
         ))}
       </div>
+
+      <div className="h-16" />
 
 
     </div>
