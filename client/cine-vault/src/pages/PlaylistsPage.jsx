@@ -42,6 +42,8 @@ const PlaylistPage = () => {
 
   const [searchText, setSearchText] = useState("");
   const [filterCount, setFilterCount] = useState(0);
+  const [playlist, setPlaylist] = useState([]);
+  const [user, setUser] = useState(null);
 
   const handleSearch = () => {
     console.log(searchText);
@@ -82,13 +84,33 @@ const PlaylistPage = () => {
         if (error) {
         console.warn('Error fetching profile:', error);
         } else if (data) {
+          setUser(data.user_id);
         }
     }
 
     };
 
     fetchProfile();
-  }, []);
+  });
+
+  useEffect(() => {
+    const fetchPlaylists = async () => {
+      if (user) {
+        const { data, error } = await supabase
+          .from('Playlists')
+          .select();
+  
+        if (error) {
+          console.warn('Error fetching Playlists:', error);
+        } else if (data) {
+          console.log("Playlist Data:", data);
+          setPlaylist(data);
+        }
+      }
+    };
+    fetchPlaylists();
+  }, [user]); // only runs when user changes
+  
 
   // Dark #2D2E39
   // Dark Contrast #25262F
@@ -134,7 +156,7 @@ const PlaylistPage = () => {
 
       <h1 className={`font-body ml-16 pt-8 text-xl `} >Popular Playlists</h1>
 
-      <HorizontalList playlists={popularPlaylists} />
+      <HorizontalList playlists={playlist} />
 
       <h1 className={`font-body ml-16 pt-8 pb-8 text-xl `} >Your Playlists</h1>
 
@@ -152,8 +174,8 @@ const PlaylistPage = () => {
         </h2>
       </div>
 
-        {popularPlaylists.map((playlist, index) => (
-          <PlaylistCard playlist={playlist} />
+        {playlist.map((playlist, index) => (
+          <PlaylistCard playlist={playlist} key={index} />
         ))}
       </div>
 
