@@ -127,8 +127,9 @@ const PlaylistPage = () => {
       {/* Page Title */}
       <h1 className={`text-4xl font-body py-2 ml-12  `}>Movie Playlists</h1>
       {/* Filters, etc */}
-      <div className={`flex items-center justify-end px-12 font-body  `}>
-        <div className="flex items-center justify-center space-x-4 " >
+      <div className={`flex items-center justify-between px-16 font-body pt-4`}>
+        <h1 className={`font-body text-xl `} >Popular Playlists</h1>
+        <div className="flex items-center space-x-4 " >
           {/* Filter Counter */}
           <div className={`h-8 w-8 flex items-center justify-center border rounded-full font-body shadow-[rgba(0,0,15,0.5)_10px_5px_4px_0px]  `} >
             {filterCount}
@@ -154,11 +155,14 @@ const PlaylistPage = () => {
         </div>
       </div>
 
-      <h1 className={`font-body ml-16 pt-8 text-xl `} >Popular Playlists</h1>
-
       <HorizontalList playlists={playlist} />
 
-      <h1 className={`font-body ml-16 pt-8 pb-8 text-xl `} >Your Playlists</h1>
+      <div className="flex items-center justify-between px-16">
+        <h1 className={`font-body pt-8 pb-8 text-xl `} >Your Playlists</h1>
+        <div onClick={() => {console.log("Creating new playlist...")}} className="font-body text-lg bg-theme p-2 rounded-lg border cursor-pointer shadow-[rgba(0,0,15,0.5)_10px_5px_4px_0px] ">
+          Create New Playlist
+        </div>
+      </div>
 
       <div className="grid grid-cols-4 gap-y-16 ml-16 pr-6 ">
         
