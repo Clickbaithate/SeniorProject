@@ -17,7 +17,6 @@ import superhero from "../assets/superhero.png";
 import thriller from "../assets/thriller.png";
 
 const ChallengeCard = ({ challenge }) => {
-
   let asset;
   let color;
   const navigate = useNavigate();
@@ -71,20 +70,29 @@ const ChallengeCard = ({ challenge }) => {
 
   const onClick = (id) => {
     navigate(`/challenges/${id}`);
-  }
+  };
 
   return (
-    <div onClick={() => onClick(challenge.challenge_id)} className="w-56 h-64 accent flex flex-col justify-around items-center rounded-3xl shadow-[rgba(0,0,15,0.5)_10px_5px_4px_0px] hover:scale-110 duration-500 cursor-pointer" >
-      <h1 className="font-body text-theme text-center px-4 " >{challenge.title}</h1>
-      <img src={asset} className="w-24 h-24" />
-      <div className="w-[90%] h-2 bg-gray-300 rounded-full" >
-        <div className={`h-full ${color} rounded-full flex items-end justify-start`} style={{ width: `${challenge.percent}%` }} >
-          <div className="mb-2 ml-2 font-body text-theme " >{challenge.percent}%</div>
+    <div onClick={() => onClick(challenge.challenge_id)} className="w-72 h-[350px] accent rounded-xl flex flex-col items-center justify-center space-y-6 shadow-[rgba(0,0,15,0.5)_10px_5px_4px_0px] hover:scale-110 duration-500 cursor-pointer">
+      <h1 className="font-body text-theme text-center px-4">{challenge.title}</h1>
+      <img src={asset} className="w-24 h-24" alt="Challenge" />
+      <div className="w-[90%] h-2 bg-gray-300 rounded-full">
+        <div className={`h-full ${color} rounded-full flex items-end justify-start`} style={{ width: `${challenge.percent}%` }}>
+          <div className="mb-2 ml-2 font-body text-theme">{challenge.percent}%</div>
         </div>
       </div>
+
+      <button 
+        onClick={(e) => {
+          e.stopPropagation();
+          onClick(challenge.challenge_id);
+        }}
+        className="bg-theme font-body text-theme w-36 h-10 rounded-xl shadow-[rgba(0,0,15,0.5)_10px_5px_4px_0px] hover:scale-110 duration-500 mt-4"
+      >
+        View Challenge
+      </button>
     </div>
   );
-
 };
 
 export default ChallengeCard;
