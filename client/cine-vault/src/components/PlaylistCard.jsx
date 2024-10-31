@@ -13,7 +13,7 @@ const PlaylistCard = ({ playlist, index }) => {
   return (
     <div
       key={index}
-      onClick={() => handleOnClick(playlist.id)}
+      onClick={() => handleOnClick(playlist.playlist_id)}
       className="transition-all ease-in-out duration-500 transform hover:scale-105 w-[350px] h-56 bg-transparent flex-shrink-0 cursor-pointer"
     >
       <img
