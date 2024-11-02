@@ -17,19 +17,22 @@ const PlaylistPage = () => {
   const [popularPlaylists, setPopularPlaylists] = useState([]);
   const [user, setUser] = useState(null);
   const [showCreatePlaylist, setShowCreatePlaylist] = useState(false);
+  const [filteredPlaylists, setFilteredPlaylists] = useState([]);
 
-  const handleSearch = () => {
-    console.log(searchText);
+  const handleSearch = (text) => {
+    setFilteredPlaylists(
+      text.trim()
+        ? playlist.filter((item) =>
+            item.title.toLowerCase().includes(text.toLowerCase())
+          )
+        : playlist
+    );
   };
 
   const handleFilter = () => {
     console.log("FILTER BUTTON!");
     if (filterCount == 0) setFilterCount((prevCount) => prevCount + 1);
     else setFilterCount((prevCount) => prevCount - 1);
-  };
-
-  const handlePlaylistClick = (playlist) => {
-    console.log(playlist);
   };
 
   useEffect(() => {
@@ -58,7 +61,6 @@ const PlaylistPage = () => {
         if (error) {
           console.warn('Error fetching Playlists:', error);
         } else if (data) {
-          console.log("Playlist Data:", data);
           setPlaylist(data);
         }
       }
@@ -73,7 +75,6 @@ const PlaylistPage = () => {
         if (error) {
           console.warn('Error fetching Playlists:', error);
         } else if (data) {
-          console.log("Playlist Data:", data);
           setPopularPlaylists(data);
         }
       }
@@ -100,7 +101,7 @@ const PlaylistPage = () => {
           >
             Add Filter
           </div>
-          <form onSubmit={handleSearch} className="flex border items-center rounded-lg p-2 w-64 shadow-[rgba(0,0,15,0.5)_10px_5px_4px_0px]">
+          <form className="flex border items-center rounded-lg p-2 w-64 shadow-[rgba(0,0,15,0.5)_10px_5px_4px_0px]">
             <button type="button" onClick={handleSearch} className="mr-2">
               <FontAwesomeIcon icon={faSearch} className="text-gray-500" />
             </button>
@@ -109,7 +110,10 @@ const PlaylistPage = () => {
               placeholder="Search your playlists..."
               className="w-full focus:outline-none bg-transparent font-body"
               value={searchText}
-              onChange={(e) => setSearchText(e.target.value)}
+              onChange={(e) => {
+                setSearchText(e.target.value); 
+                handleSearch(e.target.value);
+              }}
             />
           </form>
         </div>
@@ -128,7 +132,7 @@ const PlaylistPage = () => {
       </div>
 
       <div className="grid grid-cols-4 gap-y-16 ml-16">
-        {playlist.map((playlist, index) => (
+        {(filteredPlaylists.length > 0 ? filteredPlaylists : playlist).map((playlist, index) => (
           <PlaylistCard playlist={playlist} key={index} />
         ))}
       </div>
