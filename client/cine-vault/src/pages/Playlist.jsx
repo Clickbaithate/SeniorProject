@@ -7,6 +7,7 @@ import HorizontalMovieCard from "../components/HorizontalMovieCard";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faThumbsUp, faPlus } from "@fortawesome/free-solid-svg-icons";
 import "./theme.css";
+import HorizontalShowCard from "../components/HorizontalShowCard";
 
 const Playlist = () => {
   const { id } = useParams();
@@ -125,7 +126,7 @@ const Playlist = () => {
       <h2 className="text-2xl font-semibold mb-6">Shows</h2>
       <div className="grid grid-cols-1 gap-y-2 pr-6">
         {shows.length > 0
-          ? shows.map((show) => <HorizontalMovieCard key={show.show_id} movie={show} />)
+          ? shows.map((show) => <HorizontalShowCard key={show.show_id} show={show} />)
           : <p>No Shows</p>}
       </div>
     </div>

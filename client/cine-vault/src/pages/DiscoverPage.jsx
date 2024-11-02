@@ -271,7 +271,7 @@ const DiscoverPage = () => {
             {
                 trendingShows 
                 ? 
-                <HorizontalList movies={trendingShows} /> 
+                <HorizontalList shows={trendingShows} /> 
                 : 
                 <div className=" flex flex-col justify-center items-center" >
                     <DotLottieReact src="https://lottie.host/beb1704b-b661-4d4c-b60d-1ce309d639d5/7b3aX5rJYc.json" loop autoplay className="w-12 h-12" />
@@ -282,7 +282,7 @@ const DiscoverPage = () => {
             {
                 popularShows 
                 ? 
-                <HorizontalList movies={popularShows} /> 
+                <HorizontalList shows={popularShows} /> 
                 : 
                 <div className=" flex flex-col justify-center items-center" >
                     <DotLottieReact src="https://lottie.host/beb1704b-b661-4d4c-b60d-1ce309d639d5/7b3aX5rJYc.json" loop autoplay className="w-12 h-12" />

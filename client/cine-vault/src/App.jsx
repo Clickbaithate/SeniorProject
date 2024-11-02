@@ -19,6 +19,7 @@ import SearchPage from './pages/SearchPage.jsx';
 import WatchedPage from './pages/WatchedPage.jsx';
 import Challenge from './pages/Challenge.jsx';
 import Playlist from './pages/Playlist.jsx';
+import ShowPage from './pages/ShowPage.jsx';
 
 function App() {
   const [session, setSession] = useState(null);
@@ -65,6 +66,8 @@ function App() {
         <Route path="/searchPage/:query" element={session ? <SearchPage /> : <Navigate to="/" />} />
 
         <Route path="/movie/:id" element={session ? <MoviePage /> : <Navigate to="/" />} />
+        <Route path="/show/:id" element={session ? <ShowPage /> : <Navigate to="/" />} />
+
         <Route path="/playlist/:id" element={session ? <Playlist /> : <Navigate to="/" />} />
         <Route path="/discover" element={session ? <DiscoverPage /> : <Navigate to="/" />} />
         <Route path="/settings" element={session ? <SettingsPage /> : <Navigate to="/" />} />
