@@ -17,8 +17,9 @@ const HomePage = () => {
   const [error, setError] = useState(null);
 
   useEffect(() => {
-    const fetchChallengesAndMovies = async () => {
+    const fetchChallengesAndRecentlyVisitedMovies = async () => {
       try {
+        // fetch challenges
         const { data: challengesData, error: challengesError } = await supabase
           .from('Challenges')
           .select('*');
@@ -28,26 +29,32 @@ const HomePage = () => {
         } else {
           setChallenges(challengesData);
         }
-
-        const { data: moviesData, error: moviesError } = await supabase
-          .from("Movies")
-          .select("movie_id, title, image, release_date, rating")
-          .range(100, 103)
-          .limit(3);
-        if (moviesError) {
-          console.error("Error fetching movies:", moviesError);
-          setError('Failed to load movies');
-        } else {
-          setMovies(moviesData);
+  
+        // fetch recently visited movies
+        const visitedMovieIds = JSON.parse(localStorage.getItem("recentlyVisitedMovies")) || [];
+        if (visitedMovieIds.length > 0) {
+          const { data: moviesData, error: moviesError } = await supabase
+            .from("Movies")
+            .select("movie_id, title, image, release_date, rating")
+            .in("movie_id", visitedMovieIds);
+          if (moviesError) {
+            console.error("Error fetching recently visited movies:", moviesError);
+            setError('Failed to load movies');
+          } else {
+            // orderded movies based on localStorage order
+            const orderedMovies = visitedMovieIds.map(id => moviesData.find(movie => movie.movie_id === id));
+            setMovies(orderedMovies);
+          }
         }
       } catch (error) {
         console.error("Error fetching data:", error);
         setError('An unexpected error occurred');
       }
     };
-
-    fetchChallengesAndMovies();
+  
+    fetchChallengesAndRecentlyVisitedMovies();
   }, []);
+  
 
   const activities = [
     {
@@ -95,11 +102,14 @@ return (
           <div className="bg-theme h-[90%] w-1/3 flex items-center justify-center mt-4">
             <div className="accent w-[90%] h-[95%] px-12 py-8 rounded-3xl">
               {/* Movie Activity */}
+              {/* Displays the Visited Movies*/}
               <p className="text-xl font-body text-theme mb-6">Recently Visited</p>
               <div className="flex flex-col items-center justify-center space-y-4">
-                {movies.map((movie, i) => (
-                  <HomeMovieCard movie={movie} key={i} />
-                ))}
+                {movies.length > 0 ? (
+                  movies.map((movie, i) => <HomeMovieCard movie={movie} key={i} />)
+                ) : (
+                  <p>No recently visited movies</p>
+                )}
               </div>
               {/* Horizontal Bar */}
               <div className="w-full h-2 bg-theme my-8 rounded-full" />

@@ -89,9 +89,14 @@ const MoviePage = () => {
     navigate(-1);
   };
 
+  //keeps track of movies visited locally
   useEffect(() => {
-    window.scrollTo(0, 0);
-  }, []);
+    if (movie && movie.movie_id) {
+      const visitedMovies = JSON.parse(localStorage.getItem("recentlyVisitedMovies")) || [];
+      const updatedMovies = [movie.movie_id, ...visitedMovies.filter(id => id !== movie.movie_id)];
+      localStorage.setItem("recentlyVisitedMovies", JSON.stringify(updatedMovies.slice(0, 3))); 
+    }
+  }, [movie]);
 
   // Dark #2D2E39
   // Dark Contrast #25262F
