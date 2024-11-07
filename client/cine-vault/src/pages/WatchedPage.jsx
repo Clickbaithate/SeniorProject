@@ -11,6 +11,7 @@ const WatchedPage = () => {
     const [filteredMovies, setFilteredMovies] = useState([]); // Stores the filtered movies
     const [filterCount, setFilterCount] = useState(0);
     const [searchText, setSearchText] = useState('');
+    const [userId, setUserId] = useState(null); // Store user ID here
 
     const handleSearch = (e) => {
         e.preventDefault();
@@ -29,28 +30,52 @@ const WatchedPage = () => {
         setFilterCount((prevCount) => prevCount + 1);
     };
 
-    useEffect(() => {
-        const fetchMoviesAndProfile = async () => {
-            try {
-                const { data, error } = await supabase
-                    .from('Movies')
-                    .select('movie_id, title, image, genres')
-                    .in('movie_id', [214, 24, 2, 100, 500, 248, 420634, 129, 533535, 105, 103, 101, 201, 203, 204, 300, 301, 306, 408, 400])
-                    .limit(25);
+    const toggleWatchedStatus = async (movieId) => {
+        const { data, error } = await supabase
+            .from('Watched_Movies')
+            .select('*')
+            .match({ user_id: userId, movie_id: movieId });
 
-                if (error) {
-                    console.error('Error fetching movies:', error);
-                } else {
-                    setMovies(data);
-                    setFilteredMovies(data);
-                }
-            } catch (error) {
-                console.error('Error fetching data:', error);
+        if (data.length > 0) {
+            await supabase.from('Watched_Movies').delete().match({ user_id: userId, movie_id: movieId });
+        } else {
+            await supabase.from('Watched_Movies').insert({ user_id: userId, movie_id: movieId });
+        }
+        // Refresh data after updating status
+        fetchMoviesAndProfile();
+    };
+
+    const fetchMoviesAndProfile = async () => {
+        if (!userId) return;
+
+        try {
+            const { data: watchedMovies, error } = await supabase
+                .from('Watched_Movies')
+                .select('movie_id')
+                .eq('user_id', userId);
+
+            if (error) {
+                console.error('Error fetching movies:', error);
+            } else {
+                setMovies(watchedMovies);
+                setFilteredMovies(watchedMovies);
             }
+        } catch (error) {
+            console.error('Error fetching data:', error);
+        }
+    };
+
+    useEffect(() => {
+        const getUserId = async () => {
+            const { data: { user } } = await supabase.auth.getUser();
+            setUserId(user.id);
         };
 
-        fetchMoviesAndProfile();
-    }, []);
+        // Retrieve user ID and then fetch movies
+        getUserId().then(() => {
+            if (userId) fetchMoviesAndProfile();
+        });
+    }, [userId]);
 
     return (
         <div className={`ml-[100px] min-h-screen bg-theme`}>
@@ -87,17 +112,18 @@ const WatchedPage = () => {
                         </form>
                     </div>
                 </div>
-
+{/* CHlasdflasldflkajsdlkfjalksflkasdjlfkaslkdfjalksjdfkl */}
                 <div className="ml-8 mt-4">
                     {filteredMovies.length > 0 ? (
                         <ul className="grid grid-cols-2 gap-4 md:grid-cols-3 lg:grid-cols-4">
+                            {/* Render movies */}
                         </ul>
                     ) : (
                         <p className="text-md">No movies matched your filter.</p>
                     )}
                 </div>
 
-                <VerticalList movies={filteredMovies} />
+                <VerticalList movies={filteredMovies} toggleWatchedStatus={toggleWatchedStatus} />
             </div>
         </div>
     );
