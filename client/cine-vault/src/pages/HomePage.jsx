@@ -108,7 +108,7 @@ return (
                 {movies.length > 0 ? (
                   movies.map((movie, i) => <HomeMovieCard movie={movie} key={i} />)
                 ) : (
-                  <p>No recently visited movies</p>
+                  <p>No recently visited media</p>
                 )}
               </div>
               {/* Horizontal Bar */}
