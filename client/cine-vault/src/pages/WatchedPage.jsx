@@ -158,42 +158,26 @@ const WatchedPage = () => {
                         </form>
                     </div>
                 </div>
-                
+
                 <div className="ml-8 mt-4">
-                <h2 className="text-2xl font-bold mb-4">Movies</h2>
+                    <h2 className="text-2xl font-bold mb-4">Movies</h2>
                     {filteredMovies.length > 0 ? (
-                        <ul className="grid grid-cols-2 gap-4 md:grid-cols-3 lg:grid-cols-4">
-                            {filteredMovies.map((movie) => (
-                                <li key={movie.movie_id} className="flex flex-col items-center">
-                                   
-                                    
-                                   
-                                </li>
-                            ))}
-                        </ul>
+                        <VerticalList movies={filteredMovies} toggleWatchedStatus={toggleWatchedStatus} />
                     ) : (
-                        <p className="text-md">No movies matched your filter.</p>
+                        <p className="text-md">No movies</p>
                     )}
+                    
                     <h2 className="text-2xl font-bold mb-4">Shows</h2>
                     {filteredShows.length > 0 ? (
-                        <ul className="grid grid-cols-2 gap-4 md:grid-cols-3 lg:grid-cols-4">
-                            {filteredShows.map((show) => (
-                                <li key={show.show_id} className="flex flex-col items-center">
-                                   
-                                    
-                                   
-                                </li>
-                            ))}
-                        </ul>
+                        <VerticalList shows={filteredShows} toggleWatchedStatus={toggleWatchedStatus} />
                     ) : (
-                        <p className="text-md">No shows matched your filter.</p>
+                        <p className="text-md">No shows</p>
                     )}
                 </div>
-
-                <VerticalList movies={filteredMovies} toggleWatchedStatus={toggleWatchedStatus} />
             </div>
         </div>
     );
+    
 };
 
 export default WatchedPage;
