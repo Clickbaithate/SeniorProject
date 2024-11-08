@@ -2,8 +2,9 @@ import React from 'react';
 import MovieCard from './movieCard';
 import GenreCard from './genreCard';
 import UserCard from './userCard';
+import ShowCard from './showCard';
 
-const VerticalList = ({ movies, genres, users, theme = 'light' }) => {
+const VerticalList = ({ movies, shows, genres, users, theme = 'light' }) => {
   return (
     <div className="mx-12 pt-4">
       <div
@@ -13,6 +14,10 @@ const VerticalList = ({ movies, genres, users, theme = 'light' }) => {
         {movies && movies.length > 0
           ? movies.map((movie, index) => (
               <MovieCard movie={movie} theme={theme} index={index} key={index} />
+            ))
+          : shows && shows.length > 0
+          ? shows.map((show, index) => (
+              <ShowCard show={show} theme={theme} index={index} key={index} />
             ))
           : genres && genres.length > 0
           ? genres.map((genre, index) => (

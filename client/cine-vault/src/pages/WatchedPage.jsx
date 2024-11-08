@@ -6,11 +6,17 @@ import VerticalList from '../components/VerticalList.jsx';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faSearch } from '@fortawesome/free-solid-svg-icons';
 
+// Random image URL for placeholder
+const bannerPlaceholder = "https://picsum.photos/1200/500"; // Random image from Lorem Picsum
+
 const WatchedPage = () => {
     const [movies, setMovies] = useState([]); // Stores the initial 11 movies
+    const [shows, setShows] = useState([]);   // Stores the watched shows
     const [filteredMovies, setFilteredMovies] = useState([]); // Stores the filtered movies
+    const [filteredShows, setFilteredShows] = useState([]);   // Stores the filtered shows
     const [filterCount, setFilterCount] = useState(0);
     const [searchText, setSearchText] = useState('');
+    const [userId, setUserId] = useState(null); // Store user ID here
 
     const handleSearch = (e) => {
         e.preventDefault();
@@ -18,10 +24,15 @@ const WatchedPage = () => {
     };
 
     const handleFilter = () => {
-        const filtered = movies.filter((movie) =>
+        const filteredMoviesList = movies.filter((movie) =>
             movie.title.toLowerCase().includes(searchText.toLowerCase())
         );
-        setFilteredMovies(filtered);
+        const filteredShowsList = shows.filter((show) =>
+            show.title.toLowerCase().includes(searchText.toLowerCase())
+        );
+
+        setFilteredMovies(filteredMoviesList);
+        setFilteredShows(filteredShowsList);
         incrementFilterCount();
     };
 
@@ -29,28 +40,88 @@ const WatchedPage = () => {
         setFilterCount((prevCount) => prevCount + 1);
     };
 
-    useEffect(() => {
-        const fetchMoviesAndProfile = async () => {
-            try {
-                const { data, error } = await supabase
-                    .from('Movies')
-                    .select('movie_id, title, image, genres')
-                    .in('movie_id', [214, 24, 2, 100, 500, 248, 420634, 129, 533535, 105, 103, 101, 201, 203, 204, 300, 301, 306, 408, 400])
-                    .limit(25);
+    const toggleWatchedStatus = async (movieId) => {
+        const { data, error } = await supabase
+            .from('Watched_Movies')
+            .select('*')
+            .match({ user_id: userId, movie_id: movieId });
 
-                if (error) {
-                    console.error('Error fetching movies:', error);
+        if (data.length > 0) {
+            await supabase.from('Watched_Movies').delete().match({ user_id: userId, movie_id: movieId });
+        } else {
+            await supabase.from('Watched_Movies').insert({ user_id: userId, movie_id: movieId });
+        }
+        // Refresh data after updating status
+        fetchMoviesAndProfile();
+    };
+
+    const fetchMoviesAndProfile = async () => {
+        if (!userId) return;
+
+        try {
+            // Fetch watched movies
+            const { data: watchedMovies, error } = await supabase
+                .from('Watched_Movies')
+                .select('movie_id')
+                .eq('user_id', userId);
+
+            if (error) {
+                console.error('Error fetching movies:', error);
+            } else {
+                // Fetch full movie details, including images, from the Movies table
+                const movieIds = watchedMovies.map((movie) => movie.movie_id);
+                const { data: movieDetails, error: movieError } = await supabase
+                    .from('Movies')
+                    .select('*')
+                    .in('movie_id', movieIds);
+
+                if (movieError) {
+                    console.error('Error fetching movie details:', movieError);
                 } else {
-                    setMovies(data);
-                    setFilteredMovies(data);
+                    setMovies(movieDetails);
+                    setFilteredMovies(movieDetails);
                 }
-            } catch (error) {
-                console.error('Error fetching data:', error);
             }
+
+            // Fetch watched shows
+            const { data: watchedShows, error: showsError } = await supabase
+                .from('Watched_Shows')
+                .select('show_id')
+                .eq('user_id', userId);
+
+            if (showsError) {
+                console.error('Error fetching shows:', showsError);
+            } else {
+                // Fetch full show details, including images, from the Shows table
+                const showIds = watchedShows.map((show) => show.show_id);
+                const { data: showDetails, error: showError } = await supabase
+                    .from('Shows')
+                    .select('*')
+                    .in('show_id', showIds);
+
+                if (showError) {
+                    console.error('Error fetching show details:', showError);
+                } else {
+                    setShows(showDetails);
+                    setFilteredShows(showDetails);
+                }
+            }
+        } catch (error) {
+            console.error('Error fetching data:', error);
+        }
+    };
+
+    useEffect(() => {
+        const getUserId = async () => {
+            const { data: { user } } = await supabase.auth.getUser();
+            setUserId(user.id);
         };
 
-        fetchMoviesAndProfile();
-    }, []);
+        // Retrieve user ID and then fetch movies and shows
+        getUserId().then(() => {
+            if (userId) fetchMoviesAndProfile();
+        });
+    }, [userId]);
 
     return (
         <div className={`ml-[100px] min-h-screen bg-theme`}>
@@ -89,18 +160,24 @@ const WatchedPage = () => {
                 </div>
 
                 <div className="ml-8 mt-4">
+                    <h2 className="text-2xl font-bold mb-4">Movies</h2>
                     {filteredMovies.length > 0 ? (
-                        <ul className="grid grid-cols-2 gap-4 md:grid-cols-3 lg:grid-cols-4">
-                        </ul>
+                        <VerticalList movies={filteredMovies} toggleWatchedStatus={toggleWatchedStatus} />
                     ) : (
-                        <p className="text-md">No movies matched your filter.</p>
+                        <p className="text-md">No movies</p>
+                    )}
+                    
+                    <h2 className="text-2xl font-bold mb-4">Shows</h2>
+                    {filteredShows.length > 0 ? (
+                        <VerticalList shows={filteredShows} toggleWatchedStatus={toggleWatchedStatus} />
+                    ) : (
+                        <p className="text-md">No shows</p>
                     )}
                 </div>
-
-                <VerticalList movies={filteredMovies} />
             </div>
         </div>
     );
+    
 };
 
 export default WatchedPage;
