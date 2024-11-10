@@ -57,7 +57,7 @@ const PlaylistPage = () => {
   useEffect(() => {
     const fetchPlaylists = async () => {
       if (user) {
-        const { data, error } = await supabase.from('Playlists').select();
+        const { data, error } = await supabase.from('Playlists').select().eq('user_id', user);
         if (error) {
           console.warn('Error fetching Playlists:', error);
         } else if (data) {
