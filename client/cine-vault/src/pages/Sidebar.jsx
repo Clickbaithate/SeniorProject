@@ -37,12 +37,12 @@ const Sidebar = () => {
     <div>
       {/* Background Blur Overlay */}
       <div
-        className={`fixed inset-0 transition-all duration-300 ease-in-out bg-black ${isHovered ? 'bg-opacity-50 backdrop-blur-sm' : 'bg-opacity-0 backdrop-blur-0'} z-39`}
+        className={`fixed inset-0 transition-all duration-300 ease-in-out bg-black ${isHovered ? 'bg-opacity-50 backdrop-blur-sm z-10' : 'bg-opacity-0 backdrop-blur-0 pointer-events-none z-0'}`}
       ></div>
 
       {/* Sidebar */}
       <div
-        className={`fixed left-0 top-0 h-screen accent ${isHovered ? 'w-[150px] rounded-tr-2xl rounded-br-2xl' : 'w-[100px]'} z-20 transition-all duration-300 ease-in-out `}
+        className={`fixed left-0 top-0 h-screen accent ${isHovered ? 'w-[150px] rounded-tr-2xl rounded-br-2xl z-20' : 'w-[100px] z-0'} transition-all duration-300 ease-in-out `}
         onMouseEnter={() => setIsHovered(true)}
         onMouseLeave={() => setIsHovered(false)}
       >
