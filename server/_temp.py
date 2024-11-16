@@ -4,11 +4,7 @@ from sklearn.metrics.pairwise import cosine_similarity
 import sys
 import json
 
-movies_1 = pd.read_csv('movies_1.csv')
-movies_2 = pd.read_csv('movies_2.csv')
-
-# Combine the two DataFrames
-movies = pd.concat([movies_1, movies_2], ignore_index=True)
+movies = pd.read_csv('movies.csv')
 keywords = pd.read_csv("movies_with_keywords.csv")
 
 movies['combined'] = (
