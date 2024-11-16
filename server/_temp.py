@@ -27,7 +27,7 @@ if not movies_data:
 
 movies = pd.DataFrame(movies_data)
 
-movies.to_csv('movies.csv', index=False)
+movies.to_csv('movies.csv')
 
 keywords = pd.read_csv("movies_with_keywords.csv")
 
