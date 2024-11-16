@@ -13,22 +13,20 @@ key = os.getenv("SUPABASE_KEY")
 supabase: Client = create_client(url, key)
 
 def fetch_movies():
-    response = supabase.from_('Movies').select('*').execute()  # Adjust table name if needed
+    response = supabase.table("Movies").select("*").execute()
+
     if response.error:
         print(f"Error fetching movies: {response.error}")
         return None
     return response.data
 
-# Retrieve the movie data from Supabase
 movies_data = fetch_movies()
 
 if not movies_data:
     sys.exit("Error fetching data from Supabase.")
 
-# Convert the data to pandas DataFrame for easier manipulation
 movies = pd.DataFrame(movies_data)
 
-# Save the movie data to a CSV file for later use
 movies.to_csv('movies.csv', index=False)
 
 keywords = pd.read_csv("movies_with_keywords.csv")
