@@ -15,7 +15,7 @@ supabase: Client = create_client(url, key)
 def fetch_movies():
     response = supabase.table("Movies").select("*").execute()
 
-    if response.status_code != 200:
+    if response.data is None:
         print(f"Error fetching movies: {response.error}")
         return None
     return response.data
