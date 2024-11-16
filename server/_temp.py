@@ -1,10 +1,36 @@
 import pandas as pd
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.metrics.pairwise import cosine_similarity
+from supabase import create_client, Client
 import sys
 import json
+from dotenv import load_dotenv
+import os
 
-movies = pd.read_csv('movies.csv')
+load_dotenv()
+url = os.getenv("SUPABASE_URL")
+key = os.getenv("SUPABASE_KEY")
+supabase: Client = create_client(url, key)
+
+def fetch_movies():
+    response = supabase.from_('movies').select('*').execute()  # Adjust table name if needed
+    if response.error:
+        print(f"Error fetching movies: {response.error}")
+        return None
+    return response.data
+
+# Retrieve the movie data from Supabase
+movies_data = fetch_movies()
+
+if not movies_data:
+    sys.exit("Error fetching data from Supabase.")
+
+# Convert the data to pandas DataFrame for easier manipulation
+movies = pd.DataFrame(movies_data)
+
+# Save the movie data to a CSV file for later use
+movies.to_csv('movies.csv', index=False)
+
 keywords = pd.read_csv("movies_with_keywords.csv")
 
 movies['combined'] = (
