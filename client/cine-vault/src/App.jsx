@@ -5,7 +5,7 @@ import SignUpPage from './pages/SignUpPage';
 import LandingPage from './pages/LandingPage';
 import HomePage from './pages/HomePage';
 //import Sidebar from './pages/Sidebar.jsx';
-import ProfileSetup from './pages/profileSetup';
+import ProfileSetup from './pages/ProfileSetup';
 import EmailConfirmationPage from './pages/EmailConfirmationPage';
 import LoginPage from './pages/LoginPage';
 import DiscoverPage from './pages/DiscoverPage';
