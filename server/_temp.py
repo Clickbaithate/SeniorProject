@@ -13,7 +13,7 @@ key = os.getenv("SUPABASE_KEY")
 supabase: Client = create_client(url, key)
 
 def fetch_movies():
-    response = supabase.from_('movies').select('*').execute()  # Adjust table name if needed
+    response = supabase.from_('Movies').select('*').execute()  # Adjust table name if needed
     if response.error:
         print(f"Error fetching movies: {response.error}")
         return None
