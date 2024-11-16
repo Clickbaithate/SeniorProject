@@ -50,7 +50,7 @@ def get_recommendations_chunked(movie_id, matrix, chunk_size=50000):
     indices = pd.Series(movies.index, index=movies['movie_id']).drop_duplicates()
     
     if movie_id not in indices:
-        return ["Movie ID not found."]
+        return [f'Movie ID: {movie_id} Not Found!']
     
     idx = indices[movie_id]
     recommendations = []
