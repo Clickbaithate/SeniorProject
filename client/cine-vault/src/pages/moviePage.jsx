@@ -92,12 +92,9 @@ const MoviePage = () => {
           { headers }
         );
 
-        console.log(`Data: ${response.data}`);
-        console.log(`Data 2: ${response.data.data}`);
-
         // Make sure the response data is an array before setting it
-        if (Array.isArray(response.data)) {
-          setTrendingArray(response.data);
+        if (Array.isArray(response.data.data)) {
+          setTrendingArray(response.data.data);
         } else {
           console.error("Received data is not an array", response.data);
           setTrendingArray([]);  // Set it to an empty array in case of invalid data
