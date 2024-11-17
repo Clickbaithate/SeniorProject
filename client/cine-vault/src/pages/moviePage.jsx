@@ -92,7 +92,8 @@ const MoviePage = () => {
           { headers }
         );
 
-        console.log(response.data);
+        console.log(`Data: ${response.data}`);
+        console.log(`Data 2: ${response.data.data}`);
 
         // Make sure the response data is an array before setting it
         if (Array.isArray(response.data)) {
