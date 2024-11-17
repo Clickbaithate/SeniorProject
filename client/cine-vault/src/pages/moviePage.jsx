@@ -92,7 +92,7 @@ const MoviePage = () => {
           { headers }
         );
 
-        console.log(response);
+        console.log(response.data);
 
         // Make sure the response data is an array before setting it
         if (Array.isArray(response.data)) {
