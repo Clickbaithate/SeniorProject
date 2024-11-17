@@ -14,7 +14,7 @@ sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding='utf-8')
 load_dotenv()
 
 # Replace with your server URL where the /movies endpoint is hosted
-MOVIE_API_URL = "http://localhost:4000/movies"
+MOVIE_API_URL = "https://senior-project-f2n8.onrender.com/movies"
 
 def fetch_movies():
     # Fetch all movies from the /movies API endpoint
