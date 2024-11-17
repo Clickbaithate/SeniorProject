@@ -83,9 +83,15 @@ const MoviePage = () => {
       if (!movie) return; // If movie data is not available, do not call the API
 
       try {
-        const response = await axios.get(
-          `http://localhost:4000/recommendations?movieId=${id}`
+        const data = { data: id }
+        const headers = { 'Content-Type': 'application/json' };
+        const response = await axios.post(
+          `https://gaelguzman.us-east-1.aws.modelbit.com/v1/get_recommendations_chunked/latest`,
+          data,
+          { headers }
         );
+
+        console.log(response);
 
         // Make sure the response data is an array before setting it
         if (Array.isArray(response.data)) {
