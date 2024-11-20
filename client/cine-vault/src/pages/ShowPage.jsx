@@ -101,6 +101,15 @@ const ShowPage = () => {
     window.scrollTo(0, 0);
   }, []);
 
+  useEffect(() => {
+    const savedTheme = localStorage.getItem('theme');
+    if (!savedTheme) {
+      document.documentElement.setAttribute('data-theme', 'light');
+    } else {
+      document.documentElement.setAttribute('data-theme', savedTheme);
+    }
+  }, []);
+
   return (
     loading ? (
       <div className="">
