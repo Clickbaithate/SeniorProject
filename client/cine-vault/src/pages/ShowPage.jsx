@@ -144,7 +144,7 @@ const ShowPage = () => {
                     </button>
                   </div>
                   <div className="flex items-center space-x-4 mt-8">
-                    <div>{show.release_date}</div>
+                    <div>{show.date}</div>
                     <div>*</div>
                     <div>{show.genres}</div>
                     <div>*</div>
