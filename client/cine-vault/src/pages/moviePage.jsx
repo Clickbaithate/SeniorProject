@@ -79,6 +79,7 @@ const MoviePage = () => {
   };
 
   //keeps track of movies visited locally
+  // keeps track of recently visited locally
   const toggleWatchedStatus = async () => {
     if (!user) return;
 
