@@ -130,7 +130,7 @@ const SearchPage = () => {
           <h2 className={`text-xl font-body ml-16 text-theme `}>
             Shows
           </h2>
-          <HorizontalList movies={shows} />
+          <HorizontalList shows={shows} />
         </div>
       )}
   

@@ -8,18 +8,18 @@ import ChallengeCard from "../components/ChallengeCard"; // Import ChallengeCard
 import SocialActivityCard from "../components/SocialActivityCard";
 import { useNavigate } from "react-router-dom";
 import HomeMovieCard from "../components/HomeMovieCard";
+import HomeShowCard from "../components/HomeShowCard"; // Ensure this is correctly imported
 
 const HomePage = () => {
   const navigate = useNavigate();
-  const [user, setUser] = useState(null);
-  const [movies, setMovies] = useState([]);
   const [challenges, setChallenges] = useState([]);
+  const [recentlyVisitedItems, setRecentlyVisitedItems] = useState([]);
   const [error, setError] = useState(null);
 
   useEffect(() => {
-    const fetchChallengesAndRecentlyVisitedMovies = async () => {
+    const fetchChallengesAndRecentlyVisitedItems = async () => {
       try {
-        // fetch challenges
+        // Fetch challenges
         const { data: challengesData, error: challengesError } = await supabase
           .from('Challenges')
           .select('*');
@@ -29,32 +29,52 @@ const HomePage = () => {
         } else {
           setChallenges(challengesData);
         }
-  
-        // fetch recently visited movies
-        const visitedMovieIds = JSON.parse(localStorage.getItem("recentlyVisitedMovies")) || [];
-        if (visitedMovieIds.length > 0) {
-          const { data: moviesData, error: moviesError } = await supabase
-            .from("Movies")
-            .select("movie_id, title, image, release_date, rating")
-            .in("movie_id", visitedMovieIds);
-          if (moviesError) {
-            console.error("Error fetching recently visited movies:", moviesError);
-            setError('Failed to load movies');
-          } else {
-            // orderded movies based on localStorage order
-            const orderedMovies = visitedMovieIds.map(id => moviesData.find(movie => movie.movie_id === id));
-            setMovies(orderedMovies);
+
+        // Fetch recently visited items
+        const visitedItems = JSON.parse(localStorage.getItem("recentlyVisitedItems")) || [];
+        if (visitedItems.length > 0) {
+          const movieIds = visitedItems.filter(item => item.type === 'movie').map(item => item.id);
+          const showIds = visitedItems.filter(item => item.type === 'show').map(item => item.id);
+
+          let moviesData = [];
+          if (movieIds.length > 0) {
+            const { data: fetchedMovies, error: moviesError } = await supabase
+              .from("Movies")
+              .select("movie_id, title, image, release_date, rating")
+              .in("movie_id", movieIds);
+            if (!moviesError) {
+              moviesData = movieIds
+                .map(id => fetchedMovies.find(movie => movie.movie_id === id))
+                .filter(Boolean)
+                .map(movie => ({ ...movie, type: 'movie' }));
+            }
           }
+
+          let showsData = [];
+          if (showIds.length > 0) {
+            const { data: fetchedShows, error: showsError } = await supabase
+              .from("Shows")
+              .select("show_id, title, image, release_date, rating")
+              .in("show_id", showIds);
+            if (!showsError) {
+              showsData = showIds
+                .map(id => fetchedShows.find(show => show.show_id === id))
+                .filter(Boolean)
+                .map(show => ({ ...show, type: 'show' }));
+            }
+          }
+
+          const combinedItems = [...moviesData, ...showsData];
+          setRecentlyVisitedItems(combinedItems);
         }
       } catch (error) {
         console.error("Error fetching data:", error);
         setError('An unexpected error occurred');
       }
     };
-  
-    fetchChallengesAndRecentlyVisitedMovies();
+
+    fetchChallengesAndRecentlyVisitedItems();
   }, []);
-  
 
   const activities = [
     {
@@ -73,7 +93,8 @@ const HomePage = () => {
       time: "30 minutes ago!",
     },
   ];
-return (
+
+  return (
     <div className={`min-h-screen bg-theme`}>
       <Sidebar />
       <div className="ml-[100px]">
@@ -101,16 +122,22 @@ return (
           {/* Right Side */}
           <div className="bg-theme h-[90%] w-1/3 flex items-center justify-center mt-4">
             <div className="accent w-[90%] h-[95%] px-12 py-8 rounded-3xl">
-              {/* Movie Activity */}
-              {/* Displays the Visited Movies*/}
+              {/* Recently Visited Items */}
               <p className="text-xl font-body text-theme mb-6">Recently Visited</p>
               <div className="flex flex-col items-center justify-center space-y-4">
-                {movies.length > 0 ? (
-                  movies.map((movie, i) => <HomeMovieCard movie={movie} key={i} />)
+                {recentlyVisitedItems.length > 0 ? (
+                  recentlyVisitedItems.map((item, i) => 
+                    item.type === 'movie' ? (
+                      <HomeMovieCard movie={item} key={i} />
+                    ) : (
+                      <HomeShowCard show={item} key={i} />
+                    )
+                  )
                 ) : (
-                  <p>No recently visited movies</p>
+                  <p>No recently visited items</p>
                 )}
               </div>
+
               {/* Horizontal Bar */}
               <div className="w-full h-2 bg-theme my-8 rounded-full" />
 
