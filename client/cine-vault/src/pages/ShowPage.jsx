@@ -98,9 +98,16 @@ const ShowPage = () => {
   };
 
   useEffect(() => {
-    window.scrollTo(0, 0);
-  }, []);
-
+    if (show && show.show_id) {
+      const visitedItems = JSON.parse(localStorage.getItem("recentlyVisitedItems")) || [];
+      const updatedItems = [
+        { id: show.show_id, type: 'show', title: show.title, image: show.image, release_date: show.release_date, rating: show.rating },
+        ...visitedItems.filter(item => item.id !== show.show_id || item.type !== 'show')
+      ];
+      localStorage.setItem("recentlyVisitedItems", JSON.stringify(updatedItems.slice(0, 3))); // Limit to the last 3 items
+    }
+  }, [show]);
+  
   useEffect(() => {
     const savedTheme = localStorage.getItem('theme');
     if (!savedTheme) {
@@ -108,7 +115,9 @@ const ShowPage = () => {
     } else {
       document.documentElement.setAttribute('data-theme', savedTheme);
     }
+    window.scrollTo(0, 0); // Moved inside this `useEffect`
   }, []);
+  
 
   return (
     loading ? (

@@ -114,6 +114,8 @@ const MoviePage = () => {
     navigate(-1);
   };
 
+  //keeps track of movies visited locally
+  // keeps track of recently visited locally
   useEffect(() => {
     const savedTheme = localStorage.getItem('theme');
     if (!savedTheme) {
@@ -143,8 +145,16 @@ const MoviePage = () => {
   };
 
   useEffect(() => {
-    window.scrollTo(0, 0);
-  }, []);
+    if (movie && movie.movie_id) {
+      const visitedItems = JSON.parse(localStorage.getItem("recentlyVisitedItems")) || [];
+      const updatedItems = [
+        { id: movie.movie_id, type: 'movie', title: movie.title, image: movie.image, release_date: movie.release_date, rating: movie.rating },
+        ...visitedItems.filter(item => item.id !== movie.movie_id || item.type !== 'movie')
+      ];
+      localStorage.setItem("recentlyVisitedItems", JSON.stringify(updatedItems.slice(0, 3))); // Limit to the last 5 items
+    }
+  }, [movie]);
+  
 
   return (
     loading ? (
