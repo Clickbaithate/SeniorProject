@@ -2,11 +2,14 @@ import React, { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import supabase from "../config/supabaseClient";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faCircleXmark, faFolderPlus, faEye, faEyeSlash, faEnvelope } from "@fortawesome/free-solid-svg-icons";
+import { faCircleXmark, faFolderPlus, faEye, faEyeSlash, faEnvelope, faPlaceOfWorship } from "@fortawesome/free-solid-svg-icons";
 import HorizontalList from "../components/HorizontalList";
 import bannerPlaceholder from "../assets/placeholder.jpg";
 import { DotLottieReact } from '@lottiefiles/dotlottie-react';
+import placeholder from "../assets/placeholder.jpg";
+import axios from "axios";
 import "./theme.css";
+import ShowCard from "../components/showCard";
 
 const ShowPage = () => {
   const { id } = useParams();
@@ -59,20 +62,45 @@ const ShowPage = () => {
           .select("*")
           .eq("user_id", session.user.id)
           .eq("show_id", id)
-          .single();
+          .maybeSingle();
         setHasWatched(Boolean(watchedData));
       }
-
-      const randomOffset = Math.floor(Math.random() * 100000);
-      const { data: trendingData, error: trendingError } = await supabase
-        .from("Shows")
-        .select()
-        .range(randomOffset, randomOffset + 19);
-      setTrendingShows(trendingData);
     };
 
     fetchProfileAndShow();
   }, [id]);
+
+  useEffect(() => {
+    const fetchRecommendations = async () => {
+      if (!show) return; // If movie data is not available, do not call the API
+
+      try {
+        const sid = Number(id);
+        const data = { data: [sid] }
+        const headers = { 'Content-Type': 'application/json' };
+        const response = await axios.post(
+          `https://gaelguzman.us-east-1.aws.modelbit.com/v1/get_show_recommendations/latest`,
+          data,
+          { headers }
+        );
+
+        // Make sure the response data is an array before setting it
+        if (Array.isArray(response.data.data)) {
+          setTrendingShows(response.data.data);
+        } else {
+          console.error("Received data is not an array", response.data);
+          setTrendingShows([]);
+        }
+      } catch (error) {
+        console.error("Error fetching recommendations:", error);
+        setTrendingShows([]);
+      }
+    };
+
+    if (loading && show) {
+      fetchRecommendations();
+    }
+  }, [id, show]);
 
   const handleClose = () => {
     navigate(-1);
@@ -144,7 +172,7 @@ const ShowPage = () => {
             <div className="flex-1 flex items-center overflow-y-auto">
               <div className="absolute left-0 top-1/2 transform -translate-y-1/2 flex items-center">
                 <img
-                  src={show.image}
+                  src={show.image ? show.image : placeholder}
                   className="shadow-[rgba(0,0,15,0.5)_10px_15px_4px_0px] min-h-[540px] max-h-[540px] max-w-[380px] rounded-2xl ml-20"
                 />
                 <div className={`flex flex-col ml-10 mr-4 font-body ${show.overview.length > 440 ? "mt-96" : "mt-72"}`}>
@@ -183,11 +211,20 @@ const ShowPage = () => {
 
         <div className="relative z-10 mt-[-100px] pl-3.5">
           <h1 className="text-4xl font-body ml-16">Similar Shows</h1>
-          {trendingShows ? (
-            <HorizontalList shows={trendingShows} />
+          {trendingShows && trendingShows.length > 0 ? (
+            <div className="flex overflow-x-auto space-x-4 ml-16 mt-4">
+              {trendingShows.map((recommendedShow) => (
+                <ShowCard key={recommendedShow} index={recommendedShow} />
+              ))}
+            </div>
           ) : (
             <div className="flex items-center justify-center">
-              <DotLottieReact src="https://lottie.host/beb1704b-b661-4d4c-b60d-1ce309d639d5/7b3aX5rJYc.json" loop autoplay className="w-32 h-32" />
+              <DotLottieReact
+                src="https://lottie.host/beb1704b-b661-4d4c-b60d-1ce309d639d5/7b3aX5rJYc.json"
+                loop
+                autoplay
+                className="w-32 h-32"
+              />
             </div>
           )}
         </div>
