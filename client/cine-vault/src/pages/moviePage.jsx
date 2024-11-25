@@ -29,7 +29,7 @@ const MoviePage = () => {
       try {
         const { data: { session }, error: sessionError } = await supabase.auth.getSession();
         if (sessionError) {
-          console.warn(sessionError);
+          console.warn("Session error:", sessionError);
           return;
         }
 
@@ -40,12 +40,14 @@ const MoviePage = () => {
             .eq("user_id", session.user.id)
             .maybeSingle();
           if (data) {
-            setUser(data);
+            setUser(data.user_id);
             setIsToggled(data.theme_settings);
+          } else {
+            console.warn("No user found with the given session ID.");
           }
         }
 
-        // Fetch recommended movies based on the movie ID
+        // Fetch movie details based on the movie ID
         const { data: movieData, error: movieError } = await supabase
           .from('Movies')
           .select('*')
@@ -114,8 +116,7 @@ const MoviePage = () => {
     navigate(-1);
   };
 
-  //keeps track of movies visited locally
-  // keeps track of recently visited locally
+  // Keeps track of movies visited locally
   useEffect(() => {
     const savedTheme = localStorage.getItem('theme');
     if (!savedTheme) {
@@ -144,16 +145,87 @@ const MoviePage = () => {
     }
   };
 
+  // Handle recently visited movies
   useEffect(() => {
-    if (movie && movie.movie_id) {
-      const visitedItems = JSON.parse(localStorage.getItem("recentlyVisitedItems")) || [];
-      const updatedItems = [
-        { id: movie.movie_id, type: 'movie', title: movie.title, image: movie.image, release_date: movie.release_date, rating: movie.rating },
-        ...visitedItems.filter(item => item.id !== movie.movie_id || item.type !== 'movie')
-      ];
-      localStorage.setItem("recentlyVisitedItems", JSON.stringify(updatedItems.slice(0, 3))); // Limit to the last 5 items
-    }
-  }, [movie]);
+    const updateRecentlyVisited = async () => {
+      if (movie && movie.movie_id && user) {
+        try {
+          const { data, error } = await supabase
+            .from("Recently_Visited")
+            .select("visited_1, visited_2, visited_3")
+            .eq("user_id", user)
+            .single();
+  
+          if (error && error.code !== "PGRST116") {
+            console.error("Error Fetching Recently Visited:", error);
+            return;
+          }
+  
+          const newVisited = { id: movie.movie_id, type: "movie" };
+  
+          if (data) {
+            // Check if the movie is already in any of the visited slots
+            let isAlreadyVisited = false;
+            let updatedVisited_1 = data.visited_1;
+            let updatedVisited_2 = data.visited_2;
+            let updatedVisited_3 = data.visited_3;
+  
+            // Handle the case where we have less than 3 movies
+            if (JSON.stringify(data.visited_1) === JSON.stringify(newVisited)) {
+              isAlreadyVisited = true; // Already at the top, no need to update
+            } else if (JSON.stringify(data.visited_2) === JSON.stringify(newVisited)) {
+              updatedVisited_1 = data.visited_2;
+              updatedVisited_2 = data.visited_1;
+              isAlreadyVisited = true; // Found in visited_2, move it to top
+            } else if (JSON.stringify(data.visited_3) === JSON.stringify(newVisited)) {
+              updatedVisited_1 = data.visited_3;
+              updatedVisited_2 = data.visited_1;
+              updatedVisited_3 = data.visited_2;
+              isAlreadyVisited = true; // Found in visited_3, move it to top
+            }
+  
+            // If not already visited, shift slots and place the new movie at the top
+            if (!isAlreadyVisited) {
+              if (!updatedVisited_1) {
+                updatedVisited_1 = newVisited; // First slot is empty
+              } else if (!updatedVisited_2) {
+                updatedVisited_2 = newVisited; // Second slot is empty
+              } else if (!updatedVisited_3) {
+                updatedVisited_3 = newVisited; // Third slot is empty
+              } else {
+                updatedVisited_3 = updatedVisited_2;
+                updatedVisited_2 = updatedVisited_1; // Shift others down
+                updatedVisited_1 = newVisited; // Place new movie at the top
+              }
+            }
+  
+            // Update the Recently_Visited table with the shifted slots
+            await supabase
+              .from("Recently_Visited")
+              .update({
+                visited_1: updatedVisited_1,
+                visited_2: updatedVisited_2,
+                visited_3: updatedVisited_3,
+              })
+              .eq("user_id", user);
+          } else {
+            // If no record exists, create a new one with this movie as visited_1
+            await supabase
+              .from("Recently_Visited")
+              .insert([{
+                user_id: user,
+                visited_1: newVisited,
+              }]);
+          }
+        } catch (err) {
+          console.error("Error updating Recently Visited:", err);
+        }
+      }
+    };
+  
+    updateRecentlyVisited();
+  }, [movie, user]);
+  
   
 
   return (
