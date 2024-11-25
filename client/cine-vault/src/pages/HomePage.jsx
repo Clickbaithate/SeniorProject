@@ -3,78 +3,90 @@ import supabase from "../config/supabaseClient";
 import Sidebar from "./Sidebar";
 import SearchBar from "../components/SearchBar";
 import HomePageCarousel from "../components/HomePageCarousel";
-import './theme.css';
-import ChallengeCard from "../components/ChallengeCard"; // Import ChallengeCard
+import "./theme.css";
+import ChallengeCard from "../components/ChallengeCard";
 import SocialActivityCard from "../components/SocialActivityCard";
 import { useNavigate } from "react-router-dom";
 import HomeMovieCard from "../components/HomeMovieCard";
-import HomeShowCard from "../components/HomeShowCard"; // Ensure this is correctly imported
+import HomeShowCard from "../components/HomeShowCard";
 
 const HomePage = () => {
   const navigate = useNavigate();
   const [challenges, setChallenges] = useState([]);
   const [recentlyVisitedItems, setRecentlyVisitedItems] = useState([]);
+  const [visitedItems, setVisitedItems] = useState([]);
   const [error, setError] = useState(null);
+  const [user, setUser] = useState(null);
 
   useEffect(() => {
-    const fetchChallengesAndRecentlyVisitedItems = async () => {
+    const fetchData = async () => {
       try {
+        // Fetch user session
+        const { data: { session }, error: sessionError } = await supabase.auth.getSession();
+        if (sessionError) {
+          console.warn("Session error:", sessionError);
+          return;
+        }
+
+        if (session) {
+          const { data, error } = await supabase
+            .from("Users")
+            .select("user_id")
+            .eq("user_id", session.user.id);
+
+          if (error) {
+            console.warn("Error fetching user:", error);
+            return;
+          }
+
+          if (data && data.length > 0) {
+            setUser(data[0].user_id);
+          } else {
+            console.warn("No user found with the given session ID.");
+          }
+        }
+
         // Fetch challenges
         const { data: challengesData, error: challengesError } = await supabase
-          .from('Challenges')
-          .select('*');
+          .from("Challenges")
+          .select("*");
+
         if (challengesError) {
-          console.error('Error fetching challenges:', challengesError);
-          setError('Failed to load challenges');
+          console.error("Error fetching challenges:", challengesError);
+          setError("Failed to load challenges");
         } else {
           setChallenges(challengesData);
         }
 
-        // Fetch recently visited items
-        const visitedItems = JSON.parse(localStorage.getItem("recentlyVisitedItems")) || [];
-        if (visitedItems.length > 0) {
-          const movieIds = visitedItems.filter(item => item.type === 'movie').map(item => item.id);
-          const showIds = visitedItems.filter(item => item.type === 'show').map(item => item.id);
+        // Fetch recently visited data if user is available
+        if (user) {
+          const { data: visitedData, error: visitedError } = await supabase
+            .from("Recently_Visited")
+            .select("visited_1, visited_2, visited_3")
+            .eq("user_id", user)
+            .single();
 
-          let moviesData = [];
-          if (movieIds.length > 0) {
-            const { data: fetchedMovies, error: moviesError } = await supabase
-              .from("Movies")
-              .select("movie_id, title, image, release_date, rating")
-              .in("movie_id", movieIds);
-            if (!moviesError) {
-              moviesData = movieIds
-                .map(id => fetchedMovies.find(movie => movie.movie_id === id))
-                .filter(Boolean)
-                .map(movie => ({ ...movie, type: 'movie' }));
-            }
+          if (visitedError) {
+            console.error("Error fetching recently visited:", visitedError);
+          } else if (visitedData) {
+            const visitedItems = [
+              visitedData.visited_1,
+              visitedData.visited_2,
+              visitedData.visited_3,
+            ].filter(Boolean);
+
+            // Update the state with visited items
+            setVisitedItems(visitedItems);
           }
-
-          let showsData = [];
-          if (showIds.length > 0) {
-            const { data: fetchedShows, error: showsError } = await supabase
-              .from("Shows")
-              .select("show_id, title, image, release_date, rating")
-              .in("show_id", showIds);
-            if (!showsError) {
-              showsData = showIds
-                .map(id => fetchedShows.find(show => show.show_id === id))
-                .filter(Boolean)
-                .map(show => ({ ...show, type: 'show' }));
-            }
-          }
-
-          const combinedItems = [...moviesData, ...showsData];
-          setRecentlyVisitedItems(combinedItems);
         }
-      } catch (error) {
-        console.error("Error fetching data:", error);
-        setError('An unexpected error occurred');
+      } catch (err) {
+        console.error("Error fetching data:", err);
+        setError("An unexpected error occurred");
       }
     };
 
-    fetchChallengesAndRecentlyVisitedItems();
-  }, []);
+    fetchData();
+  }, [user]); // Only run when user state changes
 
   const activities = [
     {
@@ -125,12 +137,12 @@ const HomePage = () => {
               {/* Recently Visited Items */}
               <p className="text-xl font-body text-theme mb-6">Recently Visited</p>
               <div className="flex flex-col items-center justify-center space-y-4">
-                {recentlyVisitedItems.length > 0 ? (
-                  recentlyVisitedItems.map((item, i) => 
-                    item.type === 'movie' ? (
-                      <HomeMovieCard movie={item} key={i} />
+                {visitedItems.length > 0 ? (
+                  visitedItems.map((item, i) =>
+                    item.type === "movie" ? (
+                      <HomeMovieCard movie={item.id} key={i} />
                     ) : (
-                      <HomeShowCard show={item} key={i} />
+                      <HomeShowCard show={item.id} key={i} />
                     )
                   )
                 ) : (
