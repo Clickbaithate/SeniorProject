@@ -122,12 +122,12 @@ const ShowPage = () => {
       await supabase
         .from("Watched_Shows")
         .delete()
-        .eq("user_id", user.user_id)
+        .eq("user_id", user)
         .eq("show_id", id);
       setHasWatched(false);
     } else {
       await supabase.from("Watched_Shows").insert({
-        user_id: user.user_id,
+        user_id: user,
         show_id: id,
       });
       setHasWatched(true);

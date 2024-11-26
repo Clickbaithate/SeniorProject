@@ -133,12 +133,12 @@ const MoviePage = () => {
       await supabase
         .from("Watched_Movies")
         .delete()
-        .eq("user_id", user.user_id)
+        .eq("user_id", user)
         .eq("movie_id", id);
       setHasWatched(false);
     } else {
       await supabase.from("Watched_Movies").insert({
-        user_id: user.user_id,
+        user_id: user,
         movie_id: id,
       });
       setHasWatched(true);
