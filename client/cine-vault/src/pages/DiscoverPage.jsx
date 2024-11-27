@@ -5,23 +5,17 @@ import SearchBar from '../components/SearchBar';
 import DiscoverCarousel from '../components/DiscoverCarousel';
 import HorizontalList from '../components/HorizontalList';
 import { DotLottieReact } from '@lottiefiles/dotlottie-react';
+import { faBomb, faDog, faFaceGrinTears, faFootball, faGhost, faHandFist, faHatCowboy, faHeart, faHouse, faKiss, faLandmark, faLeaf, faMask, faMaskVentilator, faPeopleGroup, faRadiation, faRocket, faSailboat, faTape, faTheaterMasks, } from "@fortawesome/free-solid-svg-icons";
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 
-import { 
-  faBomb, faDog, faFaceGrinTears, faFootball, 
-  faGhost, faHandFist, faHatCowboy, faHeart, 
-  faKiss, faLandmark, faLeaf, faMask, 
-  faMaskVentilator, faPeopleGroup, faRadiation, 
-  faRocket, faSailboat, faTape, faTheaterMasks 
-} from "@fortawesome/free-solid-svg-icons";
 
 const genres = [
-    { name: 'Sci-fi', value: 'Science Fiction', icon: faRocket },
+    { name: 'Sci-Fi', value: 'Science Fiction', icon: faRocket },
     { name: 'Action', value: 'action', icon: faHandFist },
     { name: 'Horror', value: 'horror', icon: faRadiation },
     { name: 'Comedy', value: 'comedy', icon: faFaceGrinTears },
     { name: 'Family', value: 'family', icon: faPeopleGroup },
     { name: 'Documentary', value: 'documentary', icon: faLandmark },
-    { name: 'Nature', value: 'nature', icon: faLeaf },
     { name: 'Drama', value: 'drama', icon: faHeart },
     { name: 'Western', value: 'western', icon: faHatCowboy },
     { name: 'Fantasy', value: 'fantasy', icon: faMask },
@@ -31,19 +25,22 @@ const genres = [
     { name: 'War', value: 'war', icon: faBomb },
     { name: 'Animation', value: 'animation', icon: faDog },
     { name: 'Crime', value: 'crime', icon: faTape },
-    { name: 'Sports', value: 'sports', icon: faFootball },
     { name: 'Mystery', value: 'mystery', icon: faMaskVentilator },
     { name: 'Adventure', value: 'adventure', icon: faSailboat },
 ];
 
 const DiscoverPage = () => {
-    const [theme, setTheme] = useState(localStorage.getItem('theme') || 'light'); // Set initial theme based on localStorage
+    const [theme, setTheme] = useState(localStorage.getItem('theme') || 'light');
     const [user, setUser] = useState(null);
     const [isToggled, setIsToggled] = useState(localStorage.getItem('theme') === 'dark');
     const [trendingMovies, setTrendingMovies] = useState();
     const [popularMovies, setPopularMovies] = useState();
     const [trendingShows, setTrendingShows] = useState();
     const [popularShows, setPopularShows] = useState();
+    const [selectedGenre, setSelectedGenre] = useState(null);
+    const [filteredMovies, setFilteredMovies] = useState([]);
+    const [filteredShows, setFilteredShows] = useState([]);
+
 
     const movieIds = [
         122,
@@ -233,6 +230,48 @@ const DiscoverPage = () => {
     
     const images = [];
 
+    const handleGenreSelect = async (genre) => {
+        if (selectedGenre === genre) {
+            setSelectedGenre(null);
+            setFilteredMovies([]);
+            setFilteredShows([]);
+        } else {
+            setSelectedGenre(genre);
+    
+            try {
+                const { data: moviesData, error: moviesError } = await supabase
+                    .from('Movies')
+                    .select('*')
+                    .ilike('genres', `%${genre}%`)
+                    .gt('rating', 7)
+                    .limit(30);
+    
+                if (moviesError) {
+                    console.error('Error fetching movies:', moviesError);
+                }
+    
+                // Fetch filtered shows from Supabase
+                const { data: showsData, error: showsError } = await supabase
+                    .from('Shows')
+                    .select('*')
+                    .ilike('genres', `%${genre}%`)
+                    .gt('rating', 7)
+                    .limit(30);
+    
+                if (showsError) {
+                    console.error('Error fetching shows:', showsError);
+                }
+    
+                setFilteredMovies(moviesData || []);
+                setFilteredShows(showsData || []);
+            } catch (error) {
+                console.error('Error fetching data:', error);
+            }
+        }
+    };
+    
+
+
     return (
         <div className={`ml-[100px] min-h-screen `}>
             <Sidebar />
@@ -243,52 +282,70 @@ const DiscoverPage = () => {
                 {image: "https://images8.alphacoders.com/129/1297243.png", movie_id: 315162}
             ]} />
 
-            <HorizontalList genres={genres} />
+            <div className="flex gap-4 my-5 overflow-x-auto px-10">
+                {genres.map((genre) => (
+                    <button
+                        key={genre.value}
+                        className={`flex items-center px-12 py-9 text-white rounded-lg text-sm uppercase transition-colors duration-300 ${
+                            selectedGenre === genre.value
+                                ? 'bg-red-500 text-white'
+                                : 'hover:bg-gray-600'
+                        }`}
+                        style={{
+                            backgroundColor:
+                                selectedGenre === genre.value
+                                    ? '#FF4C60'
+                                    : theme === 'dark'
+                                    ? '#25262F'
+                                    : '#E4E4E4',
+                            color: theme === 'dark' ? '#FFFFFF' : '#000000',
+                        }}
+                        onClick={() => handleGenreSelect(genre.value)}
+                    >
+                        {genre.icon && (
+                            <FontAwesomeIcon icon={genre.icon} className="mr-2 text-lg" />
+                        )}
+                        <span className="whitespace-nowrap">{genre.name}</span>
+                    </button>
+                ))}
+            </div>
 
-            <h1 className={`ml-[50px] mt-4 font-body text-3xl text-theme`}>Trending Movies</h1>
-            {
-                trendingMovies 
-                ? 
-                <HorizontalList movies={trendingMovies} /> 
-                : 
-                <div className=" flex flex-col justify-center items-center" >
-                    <DotLottieReact src="https://lottie.host/beb1704b-b661-4d4c-b60d-1ce309d639d5/7b3aX5rJYc.json" loop autoplay className="w-12 h-12" />
-                </div>
-            }
 
-            <h1 className={`ml-[50px] mt-4 font-body text-3xl text-theme`}>Popular Movies</h1>
-            {
-                popularMovies 
-                ? 
-                <HorizontalList movies={popularMovies} /> 
-                : 
-                <div className=" flex flex-col justify-center items-center" >
-                    <DotLottieReact src="https://lottie.host/beb1704b-b661-4d4c-b60d-1ce309d639d5/7b3aX5rJYc.json" loop autoplay className="w-12 h-12" />
-                </div>
-            }
+                <h1 className={`ml-[50px] mt-4 font-body text-3xl text-theme`}>
+                    {selectedGenre ? `Top Rated Movies for ${selectedGenre}` : 'Trending Movies'}
+                </h1>
+                {
+                    selectedGenre && filteredMovies.length > 0
+                        ? <HorizontalList movies={filteredMovies} />
+                        : trendingMovies
+                        ? <HorizontalList movies={trendingMovies} />
+                        : <div className="flex flex-col justify-center items-center">
+                            <DotLottieReact
+                                src="https://lottie.host/beb1704b-b661-4d4c-b60d-1ce309d639d5/7b3aX5rJYc.json"
+                                loop
+                                autoplay
+                                className="w-12 h-12"
+                            />
+                        </div>
+                }
 
-            <h1 className={`ml-[50px] mt-4 font-body text-3xl text-theme`}>Trending Shows</h1>
-            {
-                trendingShows 
-                ? 
-                <HorizontalList shows={trendingShows} /> 
-                : 
-                <div className=" flex flex-col justify-center items-center" >
-                    <DotLottieReact src="https://lottie.host/beb1704b-b661-4d4c-b60d-1ce309d639d5/7b3aX5rJYc.json" loop autoplay className="w-12 h-12" />
-                </div>
-            }
-
-            <h1 className={`ml-[50px] mt-4 font-body text-3xl text-theme`}>Popular Shows</h1>
-            {
-                popularShows 
-                ? 
-                <HorizontalList shows={popularShows} /> 
-                : 
-                <div className=" flex flex-col justify-center items-center" >
-                    <DotLottieReact src="https://lottie.host/beb1704b-b661-4d4c-b60d-1ce309d639d5/7b3aX5rJYc.json" loop autoplay className="w-12 h-12" />
-                </div>
-            }
-
+                <h1 className={`ml-[50px] mt-4 font-body text-3xl text-theme`}>
+                    {selectedGenre ? `Top Rated Shows for ${selectedGenre}` : 'Trending Shows'}
+                </h1>
+                {
+                    selectedGenre && filteredShows.length > 0
+                        ? <HorizontalList shows={filteredShows} />
+                        : trendingShows
+                        ? <HorizontalList shows={trendingShows} />
+                        : <div className="flex flex-col justify-center items-center">
+                            <DotLottieReact
+                                src="https://lottie.host/beb1704b-b661-4d4c-b60d-1ce309d639d5/7b3aX5rJYc.json"
+                                loop
+                                autoplay
+                                className="w-12 h-12"
+                            />
+                        </div>
+                }
             <div className="h-12" />
         </div>
     );
