@@ -44,6 +44,49 @@ const SettingsPage = () => {
     }
   };
 
+  const respondToFriendRequest = async (relationshipId, action) => {
+    try {
+      const status = action === "accepted" ? "accepted" : "rejected";
+  
+      // Update the relationship status in the Supabase table
+      const { error } = await supabase
+        .from("Friends")
+        .update({ status })
+        .eq("relationship_id", relationshipId);
+  
+      if (error) {
+        console.error("Error updating friend request status:", error.message);
+        return;
+      }
+  
+      console.log(`Friend request ${status} successfully.`);
+      
+      // Optionally update the UI
+      setPendingRequests((prevRequests) =>
+        prevRequests.filter((request) => request.relationship_id !== relationshipId)
+      );
+  
+      if (status === "accepted") {
+        // Optionally add the accepted friend to the friends list
+        const updatedRequest = pendingRequests.find(
+          (request) => request.relationship_id === relationshipId
+        );
+        if (updatedRequest) {
+          setFriends((prevFriends) => [
+            ...prevFriends,
+            {
+              user_id: updatedRequest.user_id,
+              username: "New Friend Username", // You can fetch or update the friend's username
+              profile_picture: "New Friend Picture", // Update the profile picture if available
+            },
+          ]);
+        }
+      }
+    } catch (err) {
+      console.error("Error responding to friend request:", err.message);
+    }
+  };
+
   // Fetch profile and theme settings from Supabase
   useEffect(() => {
     const fetchProfile = async () => {
