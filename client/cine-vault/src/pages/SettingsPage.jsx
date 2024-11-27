@@ -16,6 +16,33 @@ const SettingsPage = () => {
   const [message, setMessage] = useState('');
   const [isToggled, setIsToggled] = useState(localStorage.getItem('theme') === 'dark');
   const [sidebarKey, setSidebarKey] = useState(0); // State to force sidebar re-render
+  const [pendingRequests, setPendingRequests] = useState([]);
+  const [friends, setFriends] = useState([]);
+
+  // Fetch Friends List
+  const fetchFriendsList = async (userId) => {
+    try {
+      const { data, error } = await supabase
+        .from("Friends")
+        .select("friend_id, user_id")
+        .or(`user_id.eq.${userId},friend_id.eq.${userId}`)
+        .eq("status", "accepted");
+
+      if (error) throw error;
+
+      const friendIds = data.map((row) => (row.friend_id === userId ? row.user_id : row.friend_id));
+      const { data: friends, error: friendError } = await supabase
+        .from("Users")
+        .select("user_id, username, profile_picture")
+        .in("user_id", friendIds);
+
+      if (friendError) throw friendError;
+      return friends || [];
+    } catch (err) {
+      console.error("Error fetching friends list:", err.message);
+      return [];
+    }
+  };
 
   // Fetch profile and theme settings from Supabase
   useEffect(() => {
@@ -32,7 +59,7 @@ const SettingsPage = () => {
       if (session) {
         const { data, error } = await supabase
           .from('Users')
-          .select('username, bio, profile_picture, theme_settings')
+          .select('user_id, username, bio, profile_picture, theme_settings')
           .eq('user_id', session.user.id)
           .single();
 
@@ -42,6 +69,8 @@ const SettingsPage = () => {
           setUsername(data.username);
           setBio(data.bio);
           setProfilePicture(data.profile_picture);
+          fetchFriendsList(data.user_id).then(setFriends);
+          fetchPendingRequests(data.user_id).then(setPendingRequests);
           setIsToggled(data.theme_settings); // Set the toggle state based on database value
           const theme = data.theme_settings ? 'dark' : 'light';
           document.documentElement.setAttribute('theme-data', theme);
@@ -53,6 +82,22 @@ const SettingsPage = () => {
 
     fetchProfile();
   }, []);
+
+  const fetchPendingRequests = async (userId) => {
+    try {
+      const { data, error } = await supabase
+        .from("Friends")
+        .select("relationship_id, user_id, friend_id, added")
+        .eq("friend_id", userId)
+        .eq("status", "pending");
+
+      if (error) throw error;
+      return data || [];
+    } catch (err) {
+      console.error("Error fetching pending requests:", err.message);
+      return [];
+    }
+  };
 
   // Update the theme on the page when the toggle changes
   useEffect(() => {
@@ -190,6 +235,47 @@ const SettingsPage = () => {
                 {loading ? 'Saving...' : 'Save Profile'}
               </button>
             </div>
+
+            <h3 className="text-2xl font-semibold mb-4 flex justify-around">Friends</h3>
+            {friends.length > 0 ? (
+              <ul className="flex justify-around">
+                {friends.map((friend) => (
+                  <li key={friend.user_id} className="flex flex-col items-center">
+                    <img src={friend.profile_picture} alt={friend.username} className="w-8 h-8 rounded-full" />
+                    {friend.username}
+                  </li>
+                ))}
+              </ul>
+            ) : (
+              <p className="flex justify-around">No friends yet.</p>
+            )}
+
+            {pendingRequests.length > 0 ? (
+              <div>
+                <h3 className="flex justify-center">Pending Friend Requests</h3>
+                {pendingRequests.map((request) => (
+                  <div className="flex flex-col items-center mb-4" key={request.relationship_id}>
+                    <p>Request from: {request.user_id}</p>
+                    <div className="flex justify-center gap-4 mt-2">
+                      <button 
+                        className="px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600 focus:outline-none focus:ring-2 focus:ring-green-400"
+                        onClick={() => respondToFriendRequest(request.relationship_id, "accepted")}
+                      >
+                        Accept
+                      </button>
+                      <button 
+                        className="px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600 focus:outline-none focus:ring-2 focus:ring-red-400"
+                        onClick={() => respondToFriendRequest(request.relationship_id, "rejected")}
+                      >
+                        Reject
+                      </button>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <p className="flex justify-around">No pending requests.</p>
+            )}
 
             {/* Toggle Switch */}
             <div className={`h-10 font-body flex items-center justify-between p-6 w-full relative top-[165px] rounded-md ${isToggled ? "bg-[#25262F] text-white " : "bg-[#E4E4E4] text-black "} `}>
