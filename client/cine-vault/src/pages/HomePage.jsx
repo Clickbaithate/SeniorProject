@@ -117,7 +117,7 @@ const HomePage = () => {
           <div className="bg-theme h-screen w-2/3 flex flex-col items-center justify-start space-y-6">
             <HomePageCarousel
               images={[
-                "https://w0.peakpx.com/wallpaper/286/479/HD-wallpaper-suzume-no-tojimari-suzume-no-tojimari-2023-movies-netflix-animated-movies-anime-movies.jpg",
+                "https://images8.alphacoders.com/137/1374985.jpg",
                 "https://wallpapers.com/images/hd/animation-movies-1197-x-704-wallpaper-nlgddr8e66de5g41.jpg",
                 "https://i.ytimg.com/vi/8zWK0tFUJ58/maxresdefault.jpg",
                 "https://wallpapers.com/images/hd/lego-ninjago-coloured-ninjas-tvvjxferzmu2gdx6.jpg",
