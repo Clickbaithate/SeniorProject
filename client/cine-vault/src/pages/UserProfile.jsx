@@ -124,8 +124,24 @@ const UserProfile = () => {
         if (statuses.includes("accepted")) {
           setFriendRequestStatus("accepted"); // At least one accepted
         } else if (statuses.includes("rejected")) {
-          setFriendRequestStatus("rejected"); // At least one rejected
-        } else if (statuses.length > 1 && statuses.every((status) => status === "pending")) {
+          const rejectedRequest = friendRequestData.find(
+              (request) => request.status === "rejected"
+          );
+      
+          if (rejectedRequest) {
+              if (rejectedRequest.user_id === thisUser) {
+                  // The current user sent the request and it was rejected
+                  setFriendRequestStatus("Request Rejected");
+              } else {
+                  // The current user received a request and rejected it
+                  setFriendRequestStatus("Rejected Request");
+              }
+          } else {
+              // Fallback for unexpected cases (e.g., no matching rejected request)
+              setFriendRequestStatus("Rejected Request");
+          }
+      }
+       else if (statuses.length > 1 && statuses.every((status) => status === "pending")) {
           setFriendRequestStatus("pending");
         } else if (statuses.length === 1) {
           if (friendRequestData[0].user_id === thisUser) { // if the user visiting sent the request
@@ -200,39 +216,51 @@ const UserProfile = () => {
 
           {/* Check for the correct friend request state */}
           {
-            user.user_id !== thisUser && (
-              friendRequestStatus === "pending" ?
-              // If both requests are pending, show "Pending"
-              <button
-                disabled
-                className="px-4 py-2 mt-4 text-white bg-gray-500 rounded-full"
-              >
-                Pending
-              </button> :
-              // If either is accepted or rejected, show the correct status
-              friendRequestStatus === "accepted" ?
-              <button
-                disabled
-                className="px-4 py-2 mt-4 text-white bg-green-500 rounded-full"
-              >
-                Friends
-              </button> :
-              friendRequestStatus === "rejected" ?
-              <button
-                disabled
-                className="px-4 py-2 mt-4 text-white bg-red-500 rounded-full"
-              >
-                Rejected
-              </button> :
-              // If the request was not sent, show "Add Friend" button
-              <button
-                onClick={() => sendFriendRequest(thisUser, user.user_id)}
-                className="px-4 py-2 mt-4 text-white bg-blue-500 rounded-full hover:bg-blue-600 focus:outline-none"
-              >
-                Add Friend
-              </button>
-            )
-          }
+  user.user_id !== thisUser && (
+    friendRequestStatus === "pending" ? (
+      // If both requests are pending, show "Pending"
+      <button
+        disabled
+        className="px-4 py-2 mt-4 text-white bg-gray-500 rounded-full"
+      >
+        Pending
+      </button>
+    ) : friendRequestStatus === "accepted" ? (
+      // If either is accepted, show "Friends"
+      <button
+        disabled
+        className="px-4 py-2 mt-4 text-white bg-green-500 rounded-full"
+      >
+        Friends
+      </button>
+    ) : friendRequestStatus === "Request Rejected" ? (
+      // If the user visiting was the sender, show "Request Rejected"
+      <button
+        disabled
+        className="px-4 py-2 mt-4 text-white bg-red-500 rounded-full"
+      >
+        Request Rejected
+      </button>
+    ) : friendRequestStatus === "Rejected Request" ? (
+      // If the user visiting was the receiver, show "Rejected Request"
+      <button
+        disabled
+        className="px-4 py-2 mt-4 text-white bg-red-500 rounded-full"
+      >
+        Rejected Request
+      </button>
+    ) : (
+      // If the request was not sent, show "Add Friend" button
+      <button
+        onClick={() => sendFriendRequest(thisUser, user.user_id)}
+        className="px-4 py-2 mt-4 text-white bg-blue-500 rounded-full hover:bg-blue-600 focus:outline-none"
+      >
+        Add Friend
+      </button>
+    )
+  )
+}
+
 
           <div className="flex justify-around w-full max-w-3xl">
             <div className="text-center">
