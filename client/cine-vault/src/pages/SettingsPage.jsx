@@ -279,47 +279,6 @@ const SettingsPage = () => {
               </button>
             </div>
 
-            <h3 className="text-2xl font-semibold mb-4 flex justify-around">Friends</h3>
-            {friends.length > 0 ? (
-              <ul className="flex justify-around">
-                {friends.map((friend) => (
-                  <li key={friend.user_id} className="flex flex-col items-center">
-                    <img src={friend.profile_picture} alt={friend.username} className="w-8 h-8 rounded-full" />
-                    {friend.username}
-                  </li>
-                ))}
-              </ul>
-            ) : (
-              <p className="flex justify-around">No friends yet.</p>
-            )}
-
-            {pendingRequests.length > 0 ? (
-              <div>
-                <h3 className="flex justify-center">Pending Friend Requests</h3>
-                {pendingRequests.map((request) => (
-                  <div className="flex flex-col items-center mb-4" key={request.relationship_id}>
-                    <p>Request from: {request.user_id}</p>
-                    <div className="flex justify-center gap-4 mt-2">
-                      <button 
-                        className="px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600 focus:outline-none focus:ring-2 focus:ring-green-400"
-                        onClick={() => respondToFriendRequest(request.relationship_id, "accepted")}
-                      >
-                        Accept
-                      </button>
-                      <button 
-                        className="px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600 focus:outline-none focus:ring-2 focus:ring-red-400"
-                        onClick={() => respondToFriendRequest(request.relationship_id, "rejected")}
-                      >
-                        Reject
-                      </button>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            ) : (
-              <p className="flex justify-around">No pending requests.</p>
-            )}
-
             {/* Toggle Switch */}
             <div className={`h-10 font-body flex items-center justify-between p-6 w-full relative top-[165px] rounded-md ${isToggled ? "bg-[#25262F] text-white " : "bg-[#E4E4E4] text-black "} `}>
             <h2 className="flex pl-[5px] items-center">
