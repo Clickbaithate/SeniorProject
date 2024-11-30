@@ -91,65 +91,64 @@ const UserProfile = () => {
     fetchAuthenticatedUser();
   }, []);
   
-  // Fetch Authenticated User and Friends
   useEffect(() => {
     const fetchFriendRequestStatus = async () => {
       try {
-        const { data: { session }, error: sessionError } = await supabase.auth.getSession();
-        if (sessionError || !session) return;
+        if (!thisUser || !user) return;
   
-        const authenticatedUserId = session.user.id;
-  
-        // Fetch rows where the authenticated user is either user_id or friend_id
+        // Fetch rows where the authenticated user and the profile user are involved
         const { data: friendRequestData, error: friendRequestError } = await supabase
           .from("Friends")
           .select("status, user_id, friend_id")
-          .or(`user_id.eq.${authenticatedUserId},friend_id.eq.${authenticatedUserId}`);
+          .or(`user_id.eq.${thisUser},friend_id.eq.${thisUser}`)
+          .or(`user_id.eq.${user.user_id},friend_id.eq.${user.user_id}`);
   
         if (friendRequestError) {
           console.error("Error fetching friend request status:", friendRequestError);
           return;
         }
   
-        if (friendRequestData.length === 0) {
+        // Filter rows relevant to the relationship between `thisUser` and `user.user_id`
+        const filteredRequests = friendRequestData.filter(
+          (row) =>
+            (row.user_id === thisUser && row.friend_id === user.user_id) ||
+            (row.user_id === user.user_id && row.friend_id === thisUser)
+        );
+  
+        if (filteredRequests.length === 0) {
           // No relationship exists, show "Add Friend" button
           setFriendRequestStatus("none");
           return;
         }
   
-        // Check the statuses of all rows
-        const statuses = friendRequestData.map((row) => row.status);
+        // Check the statuses of the filtered rows
+        const statuses = filteredRequests.map((row) => row.status);
   
         if (statuses.includes("accepted")) {
-          setFriendRequestStatus("accepted"); // At least one accepted
+          setFriendRequestStatus("accepted"); // Relationship is accepted
         } else if (statuses.includes("rejected")) {
-          const rejectedRequest = friendRequestData.find(
-              (request) => request.status === "rejected"
+          // Determine who initiated the rejected request
+          const rejectedRequest = filteredRequests.find(
+            (row) => row.status === "rejected"
           );
-      
-          if (rejectedRequest) {
-              if (rejectedRequest.user_id === thisUser) {
-                  // The current user sent the request and it was rejected
-                  setFriendRequestStatus("Request Rejected");
-              } else {
-                  // The current user received a request and rejected it
-                  setFriendRequestStatus("Rejected Request");
-              }
+  
+          if (rejectedRequest.user_id === thisUser) {
+            setFriendRequestStatus("Request Rejected"); // Current user sent the rejected request
           } else {
-              // Fallback for unexpected cases (e.g., no matching rejected request)
-              setFriendRequestStatus("Rejected Request");
+            setFriendRequestStatus("Rejected Request"); // Current user received and rejected the request
           }
-      }
-       else if (statuses.length > 1 && statuses.every((status) => status === "pending")) {
-          setFriendRequestStatus("pending");
-        } else if (statuses.length === 1) {
-          if (friendRequestData[0].user_id === thisUser) { // if the user visiting sent the request
-            setFriendRequestStatus("pending");
-          } else { // if the user visiting got sent a request, so for the visitor itll show Add Friend bcz they have not sent a request
-            setFriendRequestStatus("none");
+        } else if (statuses.includes("pending")) {
+          const pendingRequest = filteredRequests.find(
+            (row) => row.status === "pending"
+          );
+  
+          if (pendingRequest.user_id === thisUser) {
+            setFriendRequestStatus("pending"); // Current user sent the pending request
+          } else {
+            setFriendRequestStatus("none"); // Pending request from the other user
           }
         } else {
-          setFriendRequestStatus("none"); // Fallback
+          setFriendRequestStatus("none"); // Fallback case
         }
       } catch (err) {
         console.error("Error fetching friend request status:", err);
@@ -158,6 +157,7 @@ const UserProfile = () => {
   
     fetchFriendRequestStatus();
   }, [user, thisUser]);
+  
   
 
   const sendFriendRequest = async (currentUserId, targetUserId) => {
