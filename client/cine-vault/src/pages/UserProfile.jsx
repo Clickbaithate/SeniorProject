@@ -116,36 +116,26 @@ const UserProfile = () => {
         );
   
         if (filteredRequests.length === 0) {
-          // No relationship exists
           setFriendRequestStatus("none");
           return;
         }
   
-        // Check for accepted status
-        if (filteredRequests.some((row) => row.status === "accepted")) {
+        const request = filteredRequests[0]; // Assume one relationship exists
+  
+        // Check the relationship status
+        if (request.status === "accepted") {
           setFriendRequestStatus("accepted");
-          return;
-        }
-  
-        // Check for rejected status
-        if (filteredRequests.some((row) => row.status === "rejected")) {
-          const rejectedRequest = filteredRequests.find((row) => row.status === "rejected");
-          if (rejectedRequest.user_id === thisUser) {
-            setFriendRequestStatus("Request Rejected");
+        } else if (request.status === "pending") {
+          if (request.user_id === thisUser) {
+            setFriendRequestStatus("pending"); // Current user sent the request
           } else {
-            setFriendRequestStatus("Rejected Request");
+            setFriendRequestStatus("respond"); // Current user received the request
           }
-          return;
+        } else if (request.status === "rejected") {
+          setFriendRequestStatus(
+            request.user_id === thisUser ? "Request Rejected" : "Rejected Request"
+          );
         }
-  
-        // Check for pending status (from either user)
-        if (filteredRequests.some((row) => row.status === "pending")) {
-          setFriendRequestStatus("pending");
-          return;
-        }
-  
-        // Fallback: no relevant status found
-        setFriendRequestStatus("none");
       } catch (err) {
         console.error("Error fetching friend request status:", err);
       }
@@ -153,6 +143,7 @@ const UserProfile = () => {
   
     fetchFriendRequestStatus();
   }, [user, thisUser]);
+  
   
   
   
@@ -212,50 +203,53 @@ const UserProfile = () => {
 
           {/* Check for the correct friend request state */}
           {
-  user.user_id !== thisUser && (
-    friendRequestStatus === "pending" ? (
-      // If both requests are pending, show "Pending"
-      <button
-        disabled
-        className="px-4 py-2 mt-4 text-white bg-gray-500 rounded-full"
-      >
-        Pending
-      </button>
-    ) : friendRequestStatus === "accepted" ? (
-      // If either is accepted, show "Friends"
-      <button
-        disabled
-        className="px-4 py-2 mt-4 text-white bg-green-500 rounded-full"
-      >
-        Friends
-      </button>
-    ) : friendRequestStatus === "Request Rejected" ? (
-      // If the user visiting was the sender, show "Request Rejected"
-      <button
-        disabled
-        className="px-4 py-2 mt-4 text-white bg-red-500 rounded-full"
-      >
-        Request Rejected
-      </button>
-    ) : friendRequestStatus === "Rejected Request" ? (
-      // If the user visiting was the receiver, show "Rejected Request"
-      <button
-        disabled
-        className="px-4 py-2 mt-4 text-white bg-red-500 rounded-full"
-      >
-        Rejected Request
-      </button>
-    ) : (
-      // If the request was not sent, show "Add Friend" button
-      <button
-        onClick={() => sendFriendRequest(thisUser, user.user_id)}
-        className="px-4 py-2 mt-4 text-white bg-blue-500 rounded-full hover:bg-blue-600 focus:outline-none"
-      >
-        Add Friend
-      </button>
-    )
-  )
-}
+            user.user_id !== thisUser && (
+              friendRequestStatus === "pending" ? (
+                <button
+                  disabled
+                  className="px-4 py-2 mt-4 text-white bg-gray-500 rounded-full"
+                >
+                  Pending
+                </button>
+              ) : friendRequestStatus === "respond" ? (
+                <button
+                  onClick={() => respondToFriendRequest(thisUser, user.user_id)}
+                  className="px-4 py-2 mt-4 text-white bg-yellow-500 rounded-full hover:bg-yellow-600"
+                >
+                  Respond to Request
+                </button>
+              ) : friendRequestStatus === "accepted" ? (
+                <button
+                  disabled
+                  className="px-4 py-2 mt-4 text-white bg-green-500 rounded-full"
+                >
+                  Friends
+                </button>
+              ) : friendRequestStatus === "Request Rejected" ? (
+                <button
+                  disabled
+                  className="px-4 py-2 mt-4 text-white bg-red-500 rounded-full"
+                >
+                  Request Rejected
+                </button>
+              ) : friendRequestStatus === "Rejected Request" ? (
+                <button
+                  disabled
+                  className="px-4 py-2 mt-4 text-white bg-red-500 rounded-full"
+                >
+                  Rejected Request
+                </button>
+              ) : (
+                <button
+                  onClick={() => sendFriendRequest(thisUser, user.user_id)}
+                  className="px-4 py-2 mt-4 text-white bg-blue-500 rounded-full hover:bg-blue-600 focus:outline-none"
+                >
+                  Add Friend
+                </button>
+              )
+            )
+          }
+
 
 
           <div className="flex justify-around w-full max-w-3xl">
