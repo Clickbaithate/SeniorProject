@@ -95,10 +95,6 @@ const SearchBar = ({ placeholder = "Search..." }) => {
     fetchPendingRequests();
   }, []);
   
-  
-  
-  
-
   const handleSearch = (e) => {
     e.preventDefault();
     navigate(`/searchPage/${searchText}`)
@@ -243,7 +239,7 @@ const SearchBar = ({ placeholder = "Search..." }) => {
           <div
             onClick={handleNotificationClick}
             className="transition-all ease-in-out duration-500 border-[3px] accent-border transform hover:scale-105 cursor-pointer 
-              flex items-center justify-center mr-2 w-14 h-14 rounded-xl shadow-[rgba(0,0,15,0.5)_10px_5px_4px_0px]"
+              flex items-center justify-center mr-2 w-14 h-14 rounded-xl shadow-[rgba(0,0,15,0.5)_10px_5px_4px_0px] noti"
           >
             <div className="flex">
               <FontAwesomeIcon icon={faBell} />
@@ -261,7 +257,7 @@ const SearchBar = ({ placeholder = "Search..." }) => {
                 <ul className="">
                   {notifications.map((notification, i) => (
                     <li key={i} className="p-2 flex rounded-md items-center justify-between">
-                      <div className="flex items-center">
+                      <div onClick={() => {if (username){navigate(`/user/${usernames[notification.user_id]}`);}}} className="flex items-center cursor-pointer">
                         <img src={profilePictures[notification.user_id] || errorImage} className="w-10 h-10 rounded-full mr-2" />
                         <p className="font-body text-sm text-theme">{usernames[notification.user_id] || "Loading..."}</p>
                       </div>

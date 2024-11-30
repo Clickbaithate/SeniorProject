@@ -213,11 +213,24 @@ const UserProfile = () => {
                 </button>
               ) : friendRequestStatus === "respond" ? (
                 <button
-                  onClick={() => respondToFriendRequest(thisUser, user.user_id)}
+                  onClick={() => {
+                    const element = document.querySelector(".noti");
+                    if (element) {
+                      const isClicked = element.classList.contains("active");
+
+                      if (isClicked) {
+                        element.classList.remove("active");
+                      } else {
+                        element.classList.add("active");
+                        element.click();
+                      }
+                    }
+                  }}
                   className="px-4 py-2 mt-4 text-white bg-yellow-500 rounded-full hover:bg-yellow-600"
                 >
                   Respond to Request
                 </button>
+
               ) : friendRequestStatus === "accepted" ? (
                 <button
                   disabled
