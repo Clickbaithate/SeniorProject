@@ -144,9 +144,9 @@ const UserProfile = () => {
     fetchFriendRequestStatus();
   }, [user, thisUser]);
   
-  
-  
-  
+  const handleNotificationUpdate = (s) => {
+    setFriendRequestStatus(s);
+  }
 
   const sendFriendRequest = async (currentUserId, targetUserId) => {
     try {
@@ -183,7 +183,7 @@ const UserProfile = () => {
   return (
     <div className={`ml-[100px] min-h-screen ${theme === 'dark' ? 'bg-theme ' : 'bg-theme '}`}>
       <Sidebar />
-      <SearchBar placeholder="SEARCH..." />
+      <SearchBar placeholder="SEARCH..." handleNotificationUpdate={handleNotificationUpdate} />
       <div className="max-w-3xl mx-auto py-8">
         {/* User Profile Header */}
         <header className={`p-4 mb-8 ${theme === 'dark' ? 'bg-theme' : 'bg-theme'} text-center`}>
@@ -230,7 +230,6 @@ const UserProfile = () => {
                 >
                   Respond to Request
                 </button>
-
               ) : friendRequestStatus === "accepted" ? (
                 <button
                   disabled
@@ -252,18 +251,24 @@ const UserProfile = () => {
                 >
                   Rejected Request
                 </button>
+              ) : friendRequestStatus === "rejected" ? (
+                <button
+                  disabled
+                  onClick={() => sendFriendRequest(thisUser, user.user_id)} // Enable the user to send a new friend request after rejection
+                  className="px-4 py-2 mt-4 text-white bg-red-500 rounded-full"
+                >
+                  rejected
+                </button>
               ) : (
                 <button
                   onClick={() => sendFriendRequest(thisUser, user.user_id)}
-                  className="px-4 py-2 mt-4 text-white bg-blue-500 rounded-full hover:bg-blue-600 focus:outline-none"
+                  className="px-4 py-2 mt-4 text-white bg-blue-500 rounded-full"
                 >
                   Add Friend
                 </button>
               )
             )
           }
-
-
 
           <div className="flex justify-around w-full max-w-3xl">
             <div className="text-center">

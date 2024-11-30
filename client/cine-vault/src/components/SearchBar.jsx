@@ -7,7 +7,7 @@ import "../pages/theme.css";
 import { faBell } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 
-const SearchBar = ({ placeholder = "Search..." }) => {
+const SearchBar = ({ placeholder = "Search...", handleNotificationUpdate }) => {
   const [loading, setLoading] = useState(true);
   const [username, setUsername] = useState('');
   const [profilePicture, setProfilePicture] = useState('');
@@ -185,10 +185,11 @@ const SearchBar = ({ placeholder = "Search..." }) => {
   
       console.log(`Friend request ${status} successfully.`);
       
-      // Optionally update the UI
       setNotifications((prevNotifications) =>
         prevNotifications.filter((notification) => notification.relationship_id !== relationshipId)
       );
+      handleNotificationUpdate(status);
+      console.log(status);
     } catch (err) {
       console.error("Error responding to friend request:", err.message);
     }
