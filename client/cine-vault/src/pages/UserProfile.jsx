@@ -96,7 +96,7 @@ const UserProfile = () => {
       try {
         if (!thisUser || !user) return;
   
-        // Fetch rows where the authenticated user and the profile user are involved
+        // Fetch rows involving both users
         const { data: friendRequestData, error: friendRequestError } = await supabase
           .from("Friends")
           .select("status, user_id, friend_id")
@@ -116,40 +116,36 @@ const UserProfile = () => {
         );
   
         if (filteredRequests.length === 0) {
-          // No relationship exists, show "Add Friend" button
+          // No relationship exists
           setFriendRequestStatus("none");
           return;
         }
   
-        // Check the statuses of the filtered rows
-        const statuses = filteredRequests.map((row) => row.status);
-  
-        if (statuses.includes("accepted")) {
-          setFriendRequestStatus("accepted"); // Relationship is accepted
-        } else if (statuses.includes("rejected")) {
-          // Determine who initiated the rejected request
-          const rejectedRequest = filteredRequests.find(
-            (row) => row.status === "rejected"
-          );
-  
-          if (rejectedRequest.user_id === thisUser) {
-            setFriendRequestStatus("Request Rejected"); // Current user sent the rejected request
-          } else {
-            setFriendRequestStatus("Rejected Request"); // Current user received and rejected the request
-          }
-        } else if (statuses.includes("pending")) {
-          const pendingRequest = filteredRequests.find(
-            (row) => row.status === "pending"
-          );
-  
-          if (pendingRequest.user_id === thisUser) {
-            setFriendRequestStatus("pending"); // Current user sent the pending request
-          } else {
-            setFriendRequestStatus("none"); // Pending request from the other user
-          }
-        } else {
-          setFriendRequestStatus("none"); // Fallback case
+        // Check for accepted status
+        if (filteredRequests.some((row) => row.status === "accepted")) {
+          setFriendRequestStatus("accepted");
+          return;
         }
+  
+        // Check for rejected status
+        if (filteredRequests.some((row) => row.status === "rejected")) {
+          const rejectedRequest = filteredRequests.find((row) => row.status === "rejected");
+          if (rejectedRequest.user_id === thisUser) {
+            setFriendRequestStatus("Request Rejected");
+          } else {
+            setFriendRequestStatus("Rejected Request");
+          }
+          return;
+        }
+  
+        // Check for pending status (from either user)
+        if (filteredRequests.some((row) => row.status === "pending")) {
+          setFriendRequestStatus("pending");
+          return;
+        }
+  
+        // Fallback: no relevant status found
+        setFriendRequestStatus("none");
       } catch (err) {
         console.error("Error fetching friend request status:", err);
       }
@@ -157,6 +153,7 @@ const UserProfile = () => {
   
     fetchFriendRequestStatus();
   }, [user, thisUser]);
+  
   
   
 
