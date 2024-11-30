@@ -6,6 +6,31 @@ import "./theme.css";
 const FriendsPage = () => {
 
   const [user, setUser] = useState(null);
+  const [friends, setFriends] = useState([]);
+
+  const fetchFriendsList = async (userId) => {
+    try {
+      const { data, error } = await supabase
+        .from("Friends")
+        .select("friend_id, user_id")
+        .or(`user_id.eq.${userId},friend_id.eq.${userId}`)
+        .eq("status", "accepted");
+
+      if (error) throw error;
+
+      const friendIds = data.map((row) => (row.friend_id === userId ? row.user_id : row.friend_id));
+      const { data: friends, error: friendError } = await supabase
+        .from("Users")
+        .select("user_id, username, profile_picture")
+        .in("user_id", friendIds);
+
+      if (friendError) throw friendError;
+      return friends || [];
+    } catch (err) {
+      console.error("Error fetching friends list:", err.message);
+      return [];
+    }
+  };
 
   // fetching user data
   useEffect(() => {
@@ -29,6 +54,8 @@ const FriendsPage = () => {
           console.warn('Error fetching profile:', error);
         } else if (data) {
           setUser(data);
+          fetchFriendsList(data.user_id).then(setFriends);
+          console.log(friends);
           console.log(data.profile_picture);
         }
       }
@@ -113,15 +140,15 @@ const FriendsPage = () => {
         
         {/* Contact List */}
         <div className={` overflow-y-auto h-[calc(100vh-75px)]`} style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}>
-          {contacts.map((contact) => (
-            <div className={`flex items-center mb-4 cursor-pointer  p-2 rounded-md`} key={contact.id}>
+          {friends.map((friend) => (
+            <div className={`flex items-center mb-4 cursor-pointer  p-2 rounded-md`} key={friend.user_id}>
               <div className="w-12 h-12 rounded-full mr-3">
-                <img src={contact.pfp || `https://placehold.co/200x/ffa8e4/ffffff.svg?text=${contact.sender[0]}`} alt="User Avatar" className="w-12 h-12 rounded-full object-cover" />
+                <img src={friend.profile_picture || `https://placehold.co/200x/ffa8e4/ffffff.svg?text=${friend.username[0]}`} alt="User Avatar" className="w-12 h-12 rounded-full object-cover" />
               </div>
               <div className="flex-1 min-w-0"> {/* Ensures it can shrink to fit without overflowing */}
-                <h2 className={`text-lg font-semibold text-theme `}>{contact.sender}</h2>
+                <h2 className={`text-lg font-semibold text-theme `}>{friend.username}</h2>
                 <p className={`pr-6 text-theme overflow-hidden whitespace-nowrap overflow-ellipsis`} style={{ maxHeight: '1.2em', lineHeight: '1.2em' }}>
-                  {contact.text}
+                  {friend.body}
                 </p>
               </div>
             </div>

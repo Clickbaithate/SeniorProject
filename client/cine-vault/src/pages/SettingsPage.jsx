@@ -16,6 +16,76 @@ const SettingsPage = () => {
   const [message, setMessage] = useState('');
   const [isToggled, setIsToggled] = useState(localStorage.getItem('theme') === 'dark');
   const [sidebarKey, setSidebarKey] = useState(0); // State to force sidebar re-render
+  const [pendingRequests, setPendingRequests] = useState([]);
+  const [friends, setFriends] = useState([]);
+
+  // Fetch Friends List
+  const fetchFriendsList = async (userId) => {
+    try {
+      const { data, error } = await supabase
+        .from("Friends")
+        .select("friend_id, user_id")
+        .or(`user_id.eq.${userId},friend_id.eq.${userId}`)
+        .eq("status", "accepted");
+
+      if (error) throw error;
+
+      const friendIds = data.map((row) => (row.friend_id === userId ? row.user_id : row.friend_id));
+      const { data: friends, error: friendError } = await supabase
+        .from("Users")
+        .select("user_id, username, profile_picture")
+        .in("user_id", friendIds);
+
+      if (friendError) throw friendError;
+      return friends || [];
+    } catch (err) {
+      console.error("Error fetching friends list:", err.message);
+      return [];
+    }
+  };
+
+  const respondToFriendRequest = async (relationshipId, action) => {
+    try {
+      const status = action === "accepted" ? "accepted" : "rejected";
+  
+      // Update the relationship status in the Supabase table
+      const { error } = await supabase
+        .from("Friends")
+        .update({ status })
+        .eq("relationship_id", relationshipId);
+  
+      if (error) {
+        console.error("Error updating friend request status:", error.message);
+        return;
+      }
+  
+      console.log(`Friend request ${status} successfully.`);
+      
+      // Optionally update the UI
+      setPendingRequests((prevRequests) =>
+        prevRequests.filter((request) => request.relationship_id !== relationshipId)
+      );
+  
+      if (status === "accepted") {
+        // Optionally add the accepted friend to the friends list
+        const updatedRequest = pendingRequests.find(
+          (request) => request.relationship_id === relationshipId
+        );
+        if (updatedRequest) {
+          setFriends((prevFriends) => [
+            ...prevFriends,
+            {
+              user_id: updatedRequest.user_id,
+              username: "New Friend Username", // You can fetch or update the friend's username
+              profile_picture: "New Friend Picture", // Update the profile picture if available
+            },
+          ]);
+        }
+      }
+    } catch (err) {
+      console.error("Error responding to friend request:", err.message);
+    }
+  };
 
   // Fetch profile and theme settings from Supabase
   useEffect(() => {
@@ -32,7 +102,7 @@ const SettingsPage = () => {
       if (session) {
         const { data, error } = await supabase
           .from('Users')
-          .select('username, bio, profile_picture, theme_settings')
+          .select('user_id, username, bio, profile_picture, theme_settings')
           .eq('user_id', session.user.id)
           .single();
 
@@ -42,6 +112,8 @@ const SettingsPage = () => {
           setUsername(data.username);
           setBio(data.bio);
           setProfilePicture(data.profile_picture);
+          fetchFriendsList(data.user_id).then(setFriends);
+          fetchPendingRequests(data.user_id).then(setPendingRequests);
           setIsToggled(data.theme_settings); // Set the toggle state based on database value
           const theme = data.theme_settings ? 'dark' : 'light';
           document.documentElement.setAttribute('theme-data', theme);
@@ -53,6 +125,22 @@ const SettingsPage = () => {
 
     fetchProfile();
   }, []);
+
+  const fetchPendingRequests = async (userId) => {
+    try {
+      const { data, error } = await supabase
+        .from("Friends")
+        .select("relationship_id, user_id, friend_id, added")
+        .eq("friend_id", userId)
+        .eq("status", "pending");
+
+      if (error) throw error;
+      return data || [];
+    } catch (err) {
+      console.error("Error fetching pending requests:", err.message);
+      return [];
+    }
+  };
 
   // Update the theme on the page when the toggle changes
   useEffect(() => {
