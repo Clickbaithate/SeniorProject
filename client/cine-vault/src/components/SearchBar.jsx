@@ -15,7 +15,7 @@ const SearchBar = ({ placeholder = "Search..." }) => {
   const [searchText, setSearchText] = useState("");
   const navigate = useNavigate();
   
-  const [usernames, setUsernames] = useState({});
+  const [usernames, setUsernames] = useState({}); // all usernames of people requesting you
   const [profilePictures, setProfilePictures] = useState({});
   const [showDropdown, setShowDropdown] = useState(false); // Dropdown visibility
   const dropdownRef = useRef(null); // Reference for click outside handling
@@ -39,21 +39,65 @@ const SearchBar = ({ placeholder = "Search..." }) => {
     const fetchPendingRequests = async () => {
       try {
         const { data: { session }, error: sessionError } = await supabase.auth.getSession();
-        const { data, error } = await supabase
+        if (sessionError || !session) return;
+  
+        const authenticatedUserId = session.user.id;
+  
+        // Fetch all rows where the user is either user_id or friend_id
+        const { data: friendRequestData, error: friendRequestError } = await supabase
           .from("Friends")
-          .select("relationship_id, user_id, friend_id, added")
-          .eq("friend_id", session.user.id)
-          .eq("status", "pending");
-
-        if (error) throw error;
-        setNotifications(data);
+          .select("status, user_id, friend_id, relationship_id") // Include relationship_id
+          .or(`user_id.eq.${authenticatedUserId},friend_id.eq.${authenticatedUserId}`);
+  
+        if (friendRequestError) {
+          console.error("Error fetching friend requests:", friendRequestError);
+          return;
+        }
+  
+        const groupedRequests = {};
+  
+        // Group by unique friendship (unordered pair of user_id and friend_id)
+        friendRequestData.forEach((row) => {
+          const key =
+            row.user_id < row.friend_id
+              ? `${row.user_id}-${row.friend_id}`
+              : `${row.friend_id}-${row.user_id}`;
+          if (!groupedRequests[key]) groupedRequests[key] = [];
+          groupedRequests[key].push(row);
+        });
+  
+        const validPendingNotifications = [];
+  
+        Object.values(groupedRequests).forEach((relationship) => {
+          const hasAcceptedOrRejected = relationship.some(
+            (row) => row.status === "accepted" || row.status === "rejected"
+          );
+  
+          if (hasAcceptedOrRejected) {
+            // Skip this friendship if accepted or rejected
+            return;
+          }
+  
+          // Check if there is a pending request where the authenticated user is the receiver
+          const pendingRequests = relationship.filter(
+            (row) => row.status === "pending" && row.friend_id === authenticatedUserId
+          );
+  
+          validPendingNotifications.push(...pendingRequests);
+        });
+  
+        setNotifications(validPendingNotifications);
       } catch (err) {
         console.error("Error fetching pending requests:", err.message);
-        return [];
       }
     };
+  
     fetchPendingRequests();
   }, []);
+  
+  
+  
+  
 
   const handleSearch = (e) => {
     e.preventDefault();
@@ -215,17 +259,17 @@ const SearchBar = ({ placeholder = "Search..." }) => {
             <div className="absolute right-0 mt-4 mr-2 w-80 rounded-tl-md rounded-bl-md rounded-br-md bg-theme accent-border border-2 shadow-lg z-50">
               {notifications.length > 0 ? (
                 <ul className="">
-                  {notifications.map((notification) => (
-                    <li key={notification.relationship_id} className="p-2 flex rounded-md items-center justify-between">
+                  {notifications.map((notification, i) => (
+                    <li key={i} className="p-2 flex rounded-md items-center justify-between">
                       <div className="flex items-center">
                         <img src={profilePictures[notification.user_id] || errorImage} className="w-10 h-10 rounded-full mr-2" />
-                        <p className="text-sm text-theme">{usernames[notification.user_id] || "Loading..."}</p>
+                        <p className="font-body text-sm text-theme">{usernames[notification.user_id] || "Loading..."}</p>
                       </div>
                       <div className="flex items-center space-x-2">
-                        <div onClick={() => respondToFriendRequest(notification.relationship_id, "accepted")} className="bg-green-500 p-1 rounded-md text-theme text-sm cursor-pointer hover:bg-green-600">
+                        <div onClick={() => respondToFriendRequest(notification.relationship_id, "accepted")} className="bg-green-500 p-1 rounded-md font-body text-theme text-sm cursor-pointer hover:bg-green-600">
                           Accept
                         </div>
-                        <div onClick={() => respondToFriendRequest(notification.relationship_id, "rejected")} className="bg-red-500 p-1 rounded-md text-theme text-sm cursor-pointer hover:bg-red-600">
+                        <div onClick={() => respondToFriendRequest(notification.relationship_id, "rejected")} className="bg-red-500 p-1 rounded-md font-body text-theme text-sm cursor-pointer hover:bg-red-600">
                           Reject
                         </div>
                       </div>

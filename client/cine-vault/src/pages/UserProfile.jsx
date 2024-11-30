@@ -119,7 +119,6 @@ const UserProfile = () => {
   
         // Check the statuses of all rows
         const statuses = friendRequestData.map((row) => row.status);
-        console.log(statuses)
   
         if (statuses.includes("accepted")) {
           setFriendRequestStatus("accepted"); // At least one accepted
