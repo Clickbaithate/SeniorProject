@@ -8,18 +8,15 @@ import cors from "cors";
 dotenv.config();
 
 const supabaseUrl = process.env.SUPABASE_URL;
-const supabaseKey = process.env.SUPABASE_KEY;
-const supabase = createClient(supabaseUrl, process.env.SUPABASE_SERVICE_KEY);
+const supabaseKey = process.env.SUPABASE_SERVICE_KEY; // Service Role Key
+const supabase = createClient(supabaseUrl, supabaseKey);
 
 const app = express();
 const server = http.createServer(app);
 const port = process.env.PORT || 4000;
 
-// Determine allowed origins
-const allowedOrigins =
-  process.env.NODE_ENV === "production"
-    ? ["https://cinevault.xyz"]
-    : ["http://localhost:3000", "http://localhost:5173"];
+// Allowed Origins
+const allowedOrigins = ["https://www.cinevault.xyz", "http://localhost:3000", "http://localhost:5173"];
 
 // CORS Middleware
 app.use(
@@ -29,7 +26,7 @@ app.use(
   })
 );
 
-// Socket.io setup
+// Socket.IO Setup
 const io = new Server(server, {
   cors: {
     origin: allowedOrigins,
@@ -43,11 +40,9 @@ app.use(express.json());
 io.on("connection", (socket) => {
   console.log("A user connected:", socket.id);
 
-  // Listen for messages from the client
   socket.on("sendMessage", async (message) => {
     console.log("Message received:", message);
 
-    // Save the message to Supabase
     try {
       const { data, error } = await supabase
         .from("Messages")
@@ -66,10 +61,7 @@ io.on("connection", (socket) => {
       }
 
       // Broadcast the message to all connected clients
-      io.emit("receiveMessage", {
-        ...message,
-        timestamp: new Date(),
-      });
+      io.emit("receiveMessage", { ...message, timestamp: new Date() });
     } catch (err) {
       console.error("Error handling sendMessage event:", err.message);
     }
@@ -80,10 +72,12 @@ io.on("connection", (socket) => {
   });
 });
 
+// Example HTTP Endpoint
 app.get("/", (req, res) => {
   res.send("Socket.io server is running!");
 });
 
+// Start the server
 server.listen(port, () => {
   console.log(`Server is running on port ${port}`);
 });
