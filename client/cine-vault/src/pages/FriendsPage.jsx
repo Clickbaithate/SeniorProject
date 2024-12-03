@@ -4,7 +4,7 @@ import Sidebar from './Sidebar';
 import { io } from 'socket.io-client';
 import './theme.css';
 
-const socket = io('http://localhost:4000'); 
+const socket = io('https://senior-project-vt8z.onrender.com/'); 
 
 const FriendsPage = () => {
   const [user, setUser] = useState(null);
