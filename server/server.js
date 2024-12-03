@@ -16,7 +16,7 @@ const server = http.createServer(app);
 const port = process.env.PORT || 4000;
 
 // Allowed Origins
-const allowedOrigins = ["https://www.cinevault.xyz", "http://localhost:3000", "http://localhost:5173"];
+const allowedOrigins = ["https://www.cinevault.xyz", "http://localhost:3000", "http://localhost:5173", "https://senior-project-grtydj4gz-gael-guzmans-projects.vercel.app/"];
 
 // CORS Middleware
 app.use(
