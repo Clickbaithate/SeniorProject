@@ -18,7 +18,7 @@ const port = process.env.PORT || 4000;
 // Determine allowed origins
 const allowedOrigins =
   process.env.NODE_ENV === "production"
-    ? ["https://cinevault.xyz"]
+    ? ["https://senior-project-vt8z.onrender.com/"]
     : ["http://localhost:3000", "http://localhost:5173"];
 
 // CORS Middleware
