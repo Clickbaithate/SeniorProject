@@ -61,7 +61,7 @@ const HorizontalList = ({ movies, shows, genres, users, playlists, onUserClick, 
             )))
           : shows ? 
             (shows.map((show, index) => (
-              <ShowCard show={show} index={index} key={index} />
+              recommendations ? <ShowCard index={show} key={index} /> : <ShowCard show={show} index={index} key={index} />
             )))
           : playlists.map((playlist, index) => (
             <PlaylistCard playlist={playlist} key={index} />
