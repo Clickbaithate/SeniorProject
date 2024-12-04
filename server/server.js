@@ -15,10 +15,8 @@ const app = express();
 const server = http.createServer(app);
 const port = process.env.PORT || 4000;
 
-// Allowed Origins
-const allowedOrigins = ["https://www.cinevault.xyz", "http://localhost:3000", "http://localhost:5173", "https://senior-project-grtydj4gz-gael-guzmans-projects.vercel.app/"];
+const allowedOrigins = ["https://www.cinevault.xyz", "http://localhost:3000", "http://localhost:5173"];
 
-// CORS Middleware
 app.use(
   cors({
     origin: allowedOrigins,
@@ -26,7 +24,6 @@ app.use(
   })
 );
 
-// Socket.IO Setup
 const io = new Server(server, {
   cors: {
     origin: allowedOrigins,
@@ -36,7 +33,6 @@ const io = new Server(server, {
 
 app.use(express.json());
 
-// WebSocket connection
 io.on("connection", (socket) => {
   console.log("A user connected:", socket.id);
 
@@ -44,7 +40,7 @@ io.on("connection", (socket) => {
     console.log("Message received:", message);
 
     try {
-      const { data, error } = await supabase
+      const { data: insertedMessage, error } = await supabase
         .from("Messages")
         .insert([
           {
@@ -53,15 +49,63 @@ io.on("connection", (socket) => {
             message_body: message.message_body,
             timestamp: new Date(),
           },
-        ]);
+        ])
+        .select();
 
       if (error) {
         console.error("Error saving message:", error);
         return;
       }
 
-      // Broadcast the message to all connected clients
-      io.emit("receiveMessage", { ...message, timestamp: new Date() });
+      const { data: senderMessages, error: senderFetchError } = await supabase
+        .from("Messages")
+        .select("id, timestamp")
+        .eq("sender_id", message.sender_id)
+        .eq("receiver_id", message.receiver_id)
+        .order("timestamp", { ascending: true });
+
+      if (senderFetchError) {
+        console.error("Error fetching sender's messages:", senderFetchError);
+        return;
+      }
+
+      if (senderMessages.length > 10) {
+        const oldestSenderMessageId = senderMessages[0].id;
+        const { error: senderDeleteError } = await supabase
+          .from("Messages")
+          .delete()
+          .eq("id", oldestSenderMessageId);
+
+        if (senderDeleteError) {
+          console.error("Error deleting sender's oldest message:", senderDeleteError);
+        }
+      }
+
+      const { data: receiverMessages, error: receiverFetchError } = await supabase
+        .from("Messages")
+        .select("id, timestamp")
+        .eq("sender_id", message.receiver_id)
+        .eq("receiver_id", message.sender_id)
+        .order("timestamp", { ascending: true });
+
+      if (receiverFetchError) {
+        console.error("Error fetching receiver's messages:", receiverFetchError);
+        return;
+      }
+
+      if (receiverMessages.length > 10) {
+        const oldestReceiverMessageId = receiverMessages[0].id;
+        const { error: receiverDeleteError } = await supabase
+          .from("Messages")
+          .delete()
+          .eq("id", oldestReceiverMessageId);
+
+        if (receiverDeleteError) {
+          console.error("Error deleting receiver's oldest message:", receiverDeleteError);
+        }
+      }
+
+      io.emit("receiveMessage", { ...insertedMessage[0], timestamp: new Date() });
     } catch (err) {
       console.error("Error handling sendMessage event:", err.message);
     }
@@ -72,12 +116,10 @@ io.on("connection", (socket) => {
   });
 });
 
-// Example HTTP Endpoint
 app.get("/", (req, res) => {
   res.send("Socket.io server is running!");
 });
 
-// Start the server
 server.listen(port, () => {
   console.log(`Server is running on port ${port}`);
 });
