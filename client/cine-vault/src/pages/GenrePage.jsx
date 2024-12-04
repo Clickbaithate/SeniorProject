@@ -103,15 +103,15 @@ const GenrePage = () => {
           }}
           alt="Banner"
         />
-        <p className="absolute left-14 bottom-14 text-2xl font-body text-white">
+        <p className="absolute left-14 bottom-10 text-2xl font-body text-white">
           {bestMovie ? bestMovie.title : ""}
         </p>
-        <p className="absolute left-14 top-14 text-2xl font-body text-white">
+        <p className="absolute left-14 top-10 text-2xl font-body text-white">
           Voted Most Successful "{genre}" Movie!
         </p>
       </div>
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-x-24 gap-y-6">
+      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-x-20 gap-y-6">
         {movies.map((movie, i) => (
           <MovieCard key={i} index={movie.movie_id} />
         ))}
