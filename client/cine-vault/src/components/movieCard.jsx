@@ -10,7 +10,7 @@ const MovieCard = ({ movie, index }) => {
 
   useEffect(() => {
     // If no movie is passed as a prop, fetch it from Supabase
-    if (!movie) {
+    if (!movie || index !== -1) {
       const fetchMovie = async () => {
         const { data, error } = await supabase
           .from("Movies")
@@ -34,6 +34,20 @@ const MovieCard = ({ movie, index }) => {
 
   // Use fetchedMovie if no movie prop is provided
   const displayMovie = movie || fetchedMovie;
+
+  if (index === -1) {
+    return (
+      <div key={index} className="transition-all ease-in-out duration-500 transform hover:scale-110 min-w-[175px] max-w-[175px] bg-transparent flex-shrink-0 cursor-pointer ">
+      <img 
+        src={placeholder}
+        className={`w-full object-cover mb-2 rounded-3xl h-64`} 
+      />
+      <h2 className={`text-md truncate mx-2 font-body font-semibold text-theme`}> 
+        loading
+      </h2>
+    </div>
+    )
+  }
 
   return (
     <div key={index} onClick={() => handleOnClick(displayMovie.movie_id ? displayMovie.movie_id : displayMovie.id)} className="transition-all ease-in-out duration-500 transform hover:scale-110 min-w-[175px] max-w-[175px] bg-transparent flex-shrink-0 cursor-pointer ">
