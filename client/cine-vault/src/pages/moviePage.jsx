@@ -8,6 +8,7 @@ import { DotLottieReact } from '@lottiefiles/dotlottie-react';
 import axios from "axios"; // Import axios for making HTTP requests
 import "./theme.css";
 import MovieCard from "../components/movieCard";
+import HorizontalList from "../components/HorizontalList";
 
 const MoviePage = () => {
   const { id } = useParams();
@@ -231,7 +232,7 @@ const MoviePage = () => {
   return (
     loading ? (
       <div className="">
-        <div className="relative h-[1000px] flex flex-col">
+        <div className="relative h-[850px] flex flex-col">
           <div className="relative flex flex-1 justify-end items-start rounded-br-3xl rounded-bl-3xl">
             <div
               className="opacity-25 w-full h-full rounded-br-3xl rounded-bl-3xl"
@@ -292,22 +293,14 @@ const MoviePage = () => {
 
         <div className="relative z-10 mt-[-100px] pl-3.5">
           <h1 className="text-4xl font-body ml-16">Similar Movies</h1>
-          {trendingArray && trendingArray.length > 0 ? (
-            <div className="flex overflow-x-auto space-x-4 ml-16 mt-4">
-              {trendingArray.map((recommendedMovie) => (
-                <MovieCard key={recommendedMovie} index={recommendedMovie} />
-              ))}
-            </div>
-          ) : (
-            <div className="flex items-center justify-center">
-              <DotLottieReact
-                src="https://lottie.host/beb1704b-b661-4d4c-b60d-1ce309d639d5/7b3aX5rJYc.json"
-                loop
-                autoplay
-                className="w-32 h-32"
-              />
-            </div>
-          )}
+          {trendingArray && trendingArray.length > 0
+            ? 
+              <HorizontalList movies={trendingArray} recommendations={true} />
+            : 
+              <div className="flex flex-col justify-center items-center">
+                <DotLottieReact src="https://lottie.host/beb1704b-b661-4d4c-b60d-1ce309d639d5/7b3aX5rJYc.json" loop autoplay className="w-12 h-12"/>
+              </div>
+          }
         </div>
       </div>
     ) : null
