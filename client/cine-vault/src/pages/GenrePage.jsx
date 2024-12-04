@@ -1,75 +1,151 @@
-import React from 'react';
+import { useEffect, useState } from 'react';
+import { useParams, useNavigate } from 'react-router-dom';
+import supabase from "../config/supabaseClient";
+import MovieCard from '../components/movieCard';
+import placeholder from "../assets/placeholder.jpg";
 
-// adding this comment to push link image loading fixes to main
+const GenrePage = () => {
 
-const MovieCategories = () => {
-  const categories = [
-    {
-      name: 'Action',
-      movies: [
-        { title: 'Avengers: Infinity War', poster: 'https://m.media-amazon.com/images/I/71eHZFw+GlL._AC_UF894,1000_QL80_.jpg' },
-        { title: 'Deadpool & Wolverine', poster: 'https://cdn.marvel.com/content/1x/deadpoolandwolverine_lob_crd_03.jpg' },
-        { title: 'John Wick', poster: 'https://m.media-amazon.com/images/I/81cLJ5B8ScL._AC_UY218_.jpg' },
-      ],
-    },
-    {
-      name: 'Drama',
-      movies: [
-        { title: 'Moonlight', poster: 'https://posterhouse.org/wp-content/uploads/2021/05/moonlight_0.jpg' },
-        { title: 'Forrest Gump', poster: 'https://m.media-amazon.com/images/I/71tXhRhz3vL._AC_UY218_.jpg' },
-        { title: 'The Godfather', poster: 'https://m.media-amazon.com/images/I/41+eK8zBwQL._AC_.jpg' },
-      ],
-    },
-    {
-      name: 'Comedy',
-      movies: [
-        { title: 'Scary Movie', poster: 'https://m.media-amazon.com/images/M/MV5BZGRmMGRhOWMtOTk3Ni00OTRjLTkyYTAtYzA1M2IzMGE3NGRkXkEyXkFqcGc@._V1_.jpg' },
-        { title: 'Beetlejuice', poster: 'https://all.web.img.acsta.net/img/88/01/8801185034fbb3e22b654c923f649201.jpg/r_2500_x' },
-        { title: 'Superbad', poster: 'https://m.media-amazon.com/images/I/813AT1LtpEL._AC_UY218_.jpg' },
-      ],
-    },
-    {
-      name: 'Horror',
-      movies: [
-        { title: 'A Quiet Place', poster: 'https://wwwimage-us.pplusstatic.com/thumbnails/photos/w370-q80/movie_asset/54/87/88/movie_asset_a9b1404e-51eb-4e95-8665-5c2d83a59b6c.jpg' },
-        { title: 'Us', poster: 'https://www.indiewire.com/wp-content/uploads/2019/12/us-1.jpg?w=758' },
-        { title: 'Hereditary', poster: 'https://m.media-amazon.com/images/I/81k-3gsxWPL._AC_UY218_.jpg'},
-      ],
-    },
-    {
-      name: 'Science Fiction',
-      movies: [
-        { title: 'Avatar: The Way of Water', poster: 'https://images.squarespace-cdn.com/content/v1/5a7f41ad8fd4d236a4ad76d0/1669842753281-3T90U1EY5HUNCG43XERJ/A2_Poster_DC_v80_PAYOFF_221029_12trimHD.jpg' },
-        { title: 'Interstellar', poster: 'https://m.media-amazon.com/images/I/91EYVYXTelL._AC_UY218_.jpg' },
-        { title: 'Inception', poster: 'https://m.media-amazon.com/images/I/81i7S802xFL._AC_UY218_.jpg' },
-      ],
-    },
-  ];
+  const { genre } = useParams();
+  const [movies, setMovies] = useState([]);
+  const [offset, setOffset] = useState(0);
+  const [search, setSearch] = useState(""); // Track search query
+  const [bestMovie, setBestMovie] = useState();
+  const limit = 18; // Number of movies per page
+
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    const savedTheme = localStorage.getItem('theme');
+    if (!savedTheme) {
+      document.documentElement.setAttribute('data-theme', 'light');
+    } else {
+      document.documentElement.setAttribute('data-theme', savedTheme);
+    }
+    setMovies(dummyArray)
+    fetchMovies(0); // Start at the first page (offset = 0)
+  }, [genre, search]); // Fetch movies whenever the genre or search query changes
+
+  const dummyArray = [
+    {movie_id: -1}, {movie_id: -1}, {movie_id: -1}, {movie_id: -1}, {movie_id: -1}, {movie_id: -1},
+    {movie_id: -1}, {movie_id: -1}, {movie_id: -1}, {movie_id: -1}, {movie_id: -1}, {movie_id: -1},
+    {movie_id: -1}, {movie_id: -1}, {movie_id: -1}, {movie_id: -1}, {movie_id: -1}, {movie_id: -1},
+  ]
+
+  // Fetch movies based on the current offset and search query
+  const fetchMovies = async (currentOffset) => {
+    const { data: movieData, error: movieError } = await supabase
+      .from("Movies")
+      .select("*") // Select relevant columns
+      .ilike("title", `%${search}%`) // Filter by movie title based on search query
+      .ilike("genres", `%${genre}%`) // Filter by genre
+      .order("revenue", { ascending: false })
+      .range(currentOffset, currentOffset + limit - 1); // Calculate the correct range
+
+    if (movieData) {
+      setMovies(movieData);
+      if (currentOffset === 0 && search == "") {
+        setBestMovie(movieData[0]);
+      }
+    } else {
+      console.error("Error Fetching Movies: ", movieError);
+    }
+  };
+
+  // Handle search input change
+  const handleSearch = (e) => {
+    setSearch(e.target.value); // Update search state
+    setOffset(0); // Reset to the first page whenever the search changes
+  };
+
+  // Handle Next Page
+  const handleNextPage = () => {
+    setOffset((prev) => {
+      const newOffset = prev + limit;
+      setMovies(dummyArray);
+      fetchMovies(newOffset); // Fetch the next set of movies
+      return newOffset;
+    });
+  };
+
+  // Handle Previous Page
+  const handlePreviousPage = () => {
+    if (offset === 0) return;
+    setOffset((prev) => {
+      const newOffset = prev - limit; // Ensure offset doesn't go negative
+      setMovies(dummyArray);
+      fetchMovies(newOffset);
+      return newOffset;
+    });
+  };
 
   return (
-    <div className="min-h-screen bg-gray-900 text-white flex flex-col items-center p-6">
-      <h1 className="text-4xl font-bold mb-8">Movie Categories</h1>
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 w-full max-w-4xl">
-        {categories.map((category, index) => (
-          <div key={index} className="bg-gray-800 shadow-md rounded-lg p-6">
-            <h2 className="text-2xl font-semibold mb-4">{category.name}</h2>
-            <ul className="space-y-4">
-              {category.movies.map((movie, idx) => (
-                <li key={idx} className="flex items-center space-x-4">
-                  <img
-                    src={movie.poster}
-                    alt={movie.title}
-                    className="w-16 h-24 object-cover rounded-lg"
-                  />
-                  <span className="text-lg text-gray-300">{movie.title}</span>
-                </li>
-              ))}
-            </ul>
-          </div>
+    <div className="flex ">
+      <div className="w-1/6 accent min-h-screen">
+        <div className="flex items-center justify-center py-6">
+          <input
+            type="text"
+            className="p-2 w-[90%] text-theme bg-theme rounded-lg"
+            placeholder="Search movies by title..."
+            value={search}
+            onChange={handleSearch}
+          />
+        </div>
+      </div>
+      <div className="w-5/6 flex flex-col items-center ">
+
+      <div className="relative w-full h-96 my-6 px-6 overflow-hidden">
+        <img className="w-full h-full object-cover rounded-2xl cursor-pointer" src={`${bestMovie ? bestMovie.banner : placeholder}`} 
+          onClick={() => {
+            if (bestMovie) {
+              navigate(`/movie/${bestMovie.movie_id}`);
+            }
+          }}
+          alt="Banner"
+        />
+        <p className="absolute left-14 bottom-14 text-2xl font-body text-white">
+          {bestMovie ? bestMovie.title : ""}
+        </p>
+        <p className="absolute left-14 top-14 text-2xl font-body text-white">
+          Voted Most Successful "{genre}" Movie!
+        </p>
+      </div>
+
+      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-x-24 gap-y-6">
+        {movies.map((movie, i) => (
+          <MovieCard key={i} index={movie.movie_id} />
         ))}
+      </div>
+
+      <div className="flex items-center">
+        <button
+          className={`w-32 h-12 rounded-xl m-4 ${
+            offset === 0 ? 'bg-gray-400 cursor-not-allowed' : 'accent hover:bg-blue-600'
+          }`}
+          onClick={handlePreviousPage}
+          disabled={offset === 0} // Disable button if offset is 0
+        >
+          Previous Page
+        </button>
+
+        <div className="w-24 h-12 flex items-center justify-center border-2 rounded-xl">
+          Page {(offset / limit) + 1}
+        </div>
+
+        <button
+          className={`w-32 h-12 rounded-xl m-4 ${
+            movies.length < limit ? 'bg-gray-400 cursor-not-allowed' : 'accent hover:bg-blue-600'
+          }`}
+          onClick={handleNextPage}
+          disabled={movies.length < limit} // Disable button if no more pages
+        >
+          Next Page
+        </button>
+      </div>
+
       </div>
     </div>
   );
 };
 
-export default MovieCategories;
+export default GenrePage;
