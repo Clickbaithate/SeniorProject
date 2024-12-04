@@ -21,6 +21,7 @@ import Challenge from './pages/Challenge.jsx';
 import Playlist from './pages/Playlist.jsx';
 import ShowPage from './pages/ShowPage.jsx';
 import UserProfile from './pages/UserProfile.jsx';
+import GenrePage from './pages/GenrePage.jsx';
 
 function App() {
   const [session, setSession] = useState(null);
@@ -72,8 +73,8 @@ function App() {
         <Route path="/playlist/:id" element={session ? <Playlist /> : <Navigate to="/" />} />
         <Route path="/discover" element={session ? <DiscoverPage /> : <Navigate to="/" />} />
         <Route path="/settings" element={session ? <SettingsPage /> : <Navigate to="/" />} />
-        
-        {/*i am testing my push - marcus*/}
+        <Route path="/genre/:genre" element={session ? <GenrePage /> : <Navigate to="/" />} />
+
         <Route path="/challenges" element={session ? <ChallengesPage /> : <Navigate to="/" />} />
         <Route path="/challenges/:id" element={session ? <Challenge /> : <Navigate to="/" />} />
         <Route path="/playlists" element={session ? <PlaylistsPage /> : <Navigate to="/" />} />
