@@ -9,12 +9,13 @@ const socket = io("https://senior-project-vt8z.onrender.com/");
 const FriendsPage = () => {
   const [user, setUser] = useState(null);
   const [friends, setFriends] = useState([]);
-  const [activeChat, setActiveChat] = useState(null); // Currently selected friend's ID
+  const [activeChat, setActiveChat] = useState(null);
   const [messages, setMessages] = useState([]);
   const [newMessage, setNewMessage] = useState('');
-  const [loading, setLoading] = useState(false); // Loading state for fetching messages
+  const [loading, setLoading] = useState(false);
 
-  // Fetch friends list
+  const processedMessageIds = new Set();
+
   const fetchFriendsList = async (userId) => {
     try {
       const { data, error } = await supabase
@@ -39,30 +40,41 @@ const FriendsPage = () => {
     }
   };
 
-  // Fetch chat history 
+
   const fetchChatHistory = async (friendId) => {
     setLoading(true);
     try {
-      const { data, error } = await supabase
-        .from('Messages')
-        .select('*')
-        .or(
-          `and(sender_id.eq.${user.user_id},receiver_id.eq.${friendId}),and(receiver_id.eq.${user.user_id},sender_id.eq.${friendId})`
-        )
-        .order('timestamp', { ascending: false })
+      const { data: senderMessages, error: senderError } = await supabase
+        .from("Messages")
+        .select("*")
+        .eq("sender_id", user.user_id)
+        .eq("receiver_id", friendId)
+        .order("timestamp", { ascending: false })
         .limit(10);
-
-      if (error) throw error;
-
-      setMessages(data.reverse() || []); // Reverse to display in chronological order
+  
+      if (senderError) throw senderError;
+  
+      const { data: receiverMessages, error: receiverError } = await supabase
+        .from("Messages")
+        .select("*")
+        .eq("sender_id", friendId)
+        .eq("receiver_id", user.user_id)
+        .order("timestamp", { ascending: false })
+        .limit(10);
+  
+      if (receiverError) throw receiverError;
+      const combinedMessages = [...(senderMessages || []), ...(receiverMessages || [])].sort(
+        (a, b) => new Date(a.timestamp) - new Date(b.timestamp)
+      );
+  
+      setMessages(combinedMessages);
     } catch (err) {
-      console.error('Error fetching chat history:', err.message);
+      console.error("Error fetching chat history:", err.message);
     } finally {
       setLoading(false);
     }
   };
 
-  // Fetch user profile and friends on load
   useEffect(() => {
     const fetchProfile = async () => {
       const { data: { session }, error: sessionError } = await supabase.auth.getSession();
@@ -92,40 +104,45 @@ const FriendsPage = () => {
     fetchProfile();
   }, []);
 
-  // Handle real-time messaging
   useEffect(() => {
-    socket.on('receiveMessage', (message) => {
-      setMessages((prevMessages) => {
-        const updatedMessages = [...prevMessages, message];
+    socket.on("receiveMessage", (message) => {
+      if (!processedMessageIds.has(message.id)) {
+        processedMessageIds.add(message.id);
 
-        // Keep only the last 10 messages
-        if (updatedMessages.length > 10) {
-          updatedMessages.shift(); 
+        if (
+          (message.sender_id === user.user_id && message.receiver_id === activeChat) ||
+          (message.sender_id === activeChat && message.receiver_id === user.user_id)
+        ) {
+          setMessages((prevMessages) => {
+            return prevMessages.filter((msg) => msg.id !== message.id).concat(message);
+          });
         }
-
-        return updatedMessages;
-      });
+      }
     });
 
-    return () => socket.off('receiveMessage');
-  }, []);
+    return () => socket.off("receiveMessage");
+  }, [activeChat, user]);
 
-  // Handle sending a message
+
   const sendMessage = () => {
     if (!newMessage.trim() || !activeChat) return;
 
+    const tempId = Date.now();
     const message = {
+      id: tempId,
       sender_id: user.user_id,
       receiver_id: activeChat,
       message_body: newMessage,
+      timestamp: new Date().toISOString(),
     };
 
-    socket.emit('sendMessage', message);
     setMessages((prevMessages) => [...prevMessages, { ...message, isOutgoing: true }]);
-    setNewMessage('');
+
+    socket.emit("sendMessage", message);
+
+    setNewMessage("");
   };
 
-  // Handle selecting a friend to chat with
   const handleFriendClick = (friendId) => {
     setActiveChat(friendId);
     fetchChatHistory(friendId);
