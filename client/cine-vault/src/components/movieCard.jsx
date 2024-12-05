@@ -22,7 +22,7 @@ const MovieCard = ({ movie, index }) => {
         if (error) {
           console.error("Error fetching movie:", error, movie.movie_id);
         } else {
-          setFetchedMovie(data);
+          setFetchedMovie(data[0]);
         }
       };
       fetchMovie();
