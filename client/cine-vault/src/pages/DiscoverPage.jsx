@@ -60,6 +60,7 @@ const DiscoverPage = () => {
   const [popularMovies, setPopularMovies] = useState();
   const [trendingShows, setTrendingShows] = useState();
   const [popularShows, setPopularShows] = useState();
+  const [movieRecommendations, setMovieRecommendations] = useState([]);
   const scrollRef = useRef(null);
 
   useEffect(() => {
@@ -133,6 +134,12 @@ const DiscoverPage = () => {
       if (err) console.log(err);
       else setPopularShows(dat);
       //
+      const { data: rmData, error: rmError } = await supabase
+        .from("Users")
+        .select("movie_recommendations")
+        .eq("user_id", session.user.id)
+      if (rmError) console.error("Error Fetching Recommended Movies: ", rmError);
+      else setMovieRecommendations(rmData[0].movie_recommendations);
     };
 
     fetchProfile();
@@ -169,6 +176,9 @@ const DiscoverPage = () => {
             <DotLottieReact src="https://lottie.host/beb1704b-b661-4d4c-b60d-1ce309d639d5/7b3aX5rJYc.json" loop autoplay className="w-12 h-12"/>
           </div>
       }
+
+      <h1 className={`ml-[50px] mt-4 font-body text-3xl text-theme ${movieRecommendations.length > 0 ? "" : "hidden"} `}> Based on what you watched </h1>
+      {movieRecommendations.length > 0 ? <HorizontalList movies={movieRecommendations} recommendations={true} /> : ""}
 
       <h1 className={`ml-[50px] mt-4 font-body text-3xl text-theme`}> Trending Movies </h1>
       {trendingMovies 

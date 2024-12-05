@@ -80,6 +80,23 @@ const MoviePage = () => {
     fetchProfileAndMovie();
   }, [id]);
 
+  const calculateMovieRecommendations = async () => {
+      try {
+          const { error } = await supabase
+              .from("Users")
+              .update({ movie_recommendations: trendingArray }) // Update field
+              .eq("user_id", user);
+
+          if (error) {
+              console.error("Error updating movie recommendations:", error);
+          } else {
+              console.log("Movie recommendations updated successfully.");
+          }
+      } catch (error) {
+          console.error("Error during Supabase operation:", error);
+      }
+  };
+
   // Fetch recommendations only when movie data is available and loading is complete
   useEffect(() => {
     const fetchRecommendations = async () => {
@@ -106,6 +123,7 @@ const MoviePage = () => {
         console.error("Error fetching recommendations:", error);
         setTrendingArray([]); // In case of error, set it to an empty array
       }
+      
     };
 
     if (loading && movie) { // Only fetch recommendations when movie is available
@@ -144,6 +162,7 @@ const MoviePage = () => {
       });
       setHasWatched(true);
     }
+    calculateMovieRecommendations();
   };
 
   // Handle recently visited movies

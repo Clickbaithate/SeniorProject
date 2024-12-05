@@ -5,9 +5,10 @@ import placeholder from "../assets/placeholder.jpg";
 import '../pages/theme.css';
 
 const MovieCard = ({ movie, index }) => {
+
   const navigate = useNavigate();
   const [fetchedMovie, setFetchedMovie] = useState(null);
-
+  
   useEffect(() => {
     // If no movie is passed as a prop, fetch it from Supabase
     if (!movie || index !== -1) {

@@ -35,6 +35,7 @@ const SearchPage = () => {
           .from("Movies")
           .select()
           .ilike("title", `%${query}%`)
+          .order("rating_count", { ascending: false })
           .limit(50);
 
         if (moviesError || moviesData.length === 0) {
@@ -47,6 +48,7 @@ const SearchPage = () => {
           .from("Shows")
           .select()
           .ilike("title", `%${query}%`)
+          .order("rating_count", { ascending: false })
           .limit(50);
 
         if (showsError || showsData.length === 0) {
