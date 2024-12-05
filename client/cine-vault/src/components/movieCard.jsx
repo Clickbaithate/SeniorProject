@@ -17,10 +17,10 @@ const MovieCard = ({ movie, index }) => {
           .from("Movies")
           .select("*")
           .eq("movie_id", index) // Assuming the 'index' or another unique field is used to fetch the movie
-          .single();
+          .limit(1);
         
         if (error) {
-          console.error("Error fetching movie:", error);
+          console.error("Error fetching movie:", error, movie.movie_id);
         } else {
           setFetchedMovie(data);
         }

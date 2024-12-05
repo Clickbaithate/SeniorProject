@@ -177,8 +177,8 @@ const DiscoverPage = () => {
           </div>
       }
 
-      <h1 className={`ml-[50px] mt-4 font-body text-3xl text-theme ${movieRecommendations.length > 0 ? "" : "hidden"} `}> Based on what you watched </h1>
-      {movieRecommendations.length > 0 ? <HorizontalList movies={movieRecommendations} recommendations={true} /> : ""}
+      <h1 className={`ml-[50px] mt-4 font-body text-3xl text-theme ${movieRecommendations && movieRecommendations.length > 0 ? "" : "hidden"} `}> Based on what you watched </h1>
+      {movieRecommendations && movieRecommendations.length > 0 ? <HorizontalList movies={movieRecommendations} recommendations={true} /> : ""}
 
       <h1 className={`ml-[50px] mt-4 font-body text-3xl text-theme`}> Trending Movies </h1>
       {trendingMovies 
