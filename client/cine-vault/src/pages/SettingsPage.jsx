@@ -7,7 +7,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faSun, faMoon } from "@fortawesome/free-solid-svg-icons";
 import "./theme.css";
 
-const SettingsPage = () => {
+const SettingsPage = ({ onProfileComplete }) => {
 
   const [loading, setLoading] = useState(true);
   const [username, setUsername] = useState('');
@@ -202,6 +202,7 @@ const SettingsPage = () => {
       if (error) throw error;
 
       setMessage('Profile updated successfully!');
+      onProfileComplete();
     } catch (error) {
       setMessage(`Error: ${error.message}`);
     } finally {
