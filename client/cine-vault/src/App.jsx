@@ -22,18 +22,16 @@ import UserProfile from './pages/UserProfile.jsx';
 import GenrePage from './pages/GenrePage.jsx';
 
 function App() {
-
   const [session, setSession] = useState(null);
   const [loading, setLoading] = useState(true);
   const [id, setId] = useState();
   const [userExists, setUserExists] = useState(false);
+  const [userExistsLoading, setUserExistsLoading] = useState(true);
 
-  // When the website loads, we check if the user is logged in or not
   useEffect(() => {
-    // Getting user's session through supabase, basically a cookie but not really
     const fetchSession = async () => {
       const { data: { session }, error } = await supabase.auth.getSession();
-      if (error) console.error(error)
+      if (error) console.error(error);
       if (session) {
         setId(session.user.id);
         setSession(session);
@@ -43,7 +41,6 @@ function App() {
     fetchSession();
     setLoading(false);
 
-    // Listening for any change in a user's session, signed in, signed out, etc.
     const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
       setSession(session);
     });
@@ -55,21 +52,23 @@ function App() {
 
   useEffect(() => {
     const checkUser = async () => {
-      if (!id) return;
+      if (!id) {
+        setUserExistsLoading(false);
+        return;
+      }
       const { data, error } = await supabase.from("Users").select().eq("user_id", id);
-      if (error) console.error(error);
-      else if (data && data.length > 0) setUserExists(true);
-    }
+      if (error) {
+        console.error(error);
+      } else {
+        setUserExists(data && data.length > 0);
+      }
+      setUserExistsLoading(false);
+    };
     checkUser();
-  }, [id])
+  }, [id]);
 
-  // While we get user's session state...
-  if (loading) return <div>Loading...</div>;
+  if (loading || userExistsLoading) return <div>Loading...</div>;
 
-  console.log(userExists)
-
-  // Establishing routes
-  // If a user is not logged in, redirect them accordingly
   return (
     <Router>
       <Routes>
