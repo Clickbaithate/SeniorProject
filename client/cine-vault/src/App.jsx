@@ -37,11 +37,11 @@ function App() {
       if (session) {
         setId(session.user.id);
         setSession(session);
-        setLoading(false);
       }
     };
 
     fetchSession();
+    setLoading(false);
 
     // Listening for any change in a user's session, signed in, signed out, etc.
     const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
