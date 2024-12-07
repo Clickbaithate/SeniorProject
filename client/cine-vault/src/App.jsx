@@ -63,6 +63,10 @@ function App() {
     };
   }, []);
 
+  const handleProfileCompletion = () => {
+    setUserExists(true);
+  };
+
   if (!isAppReady) return <div>Loading...</div>;
 
   return (
@@ -83,7 +87,7 @@ function App() {
         <Route path="/user/:id" element={session ? (userExists ? <UserProfile /> : <Navigate to="/settings" />) : <Navigate to="/" />} />
         <Route path="/playlist/:id" element={session ? (userExists ? <Playlist /> : <Navigate to="/settings" />) : <Navigate to="/" />} />
         <Route path="/discover" element={session ? (userExists ? <DiscoverPage /> : <Navigate to="/settings" />) : <Navigate to="/" />} />
-        <Route path="/settings" element={session ? <SettingsPage /> : <Navigate to="/" />} />
+        <Route path="/settings" element={session ? <SettingsPage onProfileComplete={handleProfileCompletion} /> : <Navigate to="/" />} />
         <Route path="/genre/:genre" element={session ? (userExists ? <GenrePage /> : <Navigate to="/settings" />) : <Navigate to="/" />} />
         <Route path="/challenges" element={session ? (userExists ? <ChallengesPage /> : <Navigate to="/settings" />) : <Navigate to="/" />} />
         <Route path="/challenges/:id" element={session ? (userExists ? <Challenge /> : <Navigate to="/settings" />) : <Navigate to="/" />} />
