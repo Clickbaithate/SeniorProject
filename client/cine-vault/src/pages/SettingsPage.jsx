@@ -256,7 +256,7 @@ const SettingsPage = () => {
               />
             </div>
 
-            <div className="mb-4">
+            <div className="">
               <label htmlFor="bio" className="block text-sm font-medium mb-1 text-theme">
                 Bio
               </label>
@@ -267,6 +267,17 @@ const SettingsPage = () => {
                 className={`h-24 w-full rounded-md px-3 py-2 text-theme accent`}
               />
             </div>
+
+            {
+              !username && !profilePicture && !bio
+              ?
+              <div className="flex flex-col font-body my-2 items-center">
+                <p>You're almost there!</p>
+                <p>Enter a username, pfp link, and bio to finalize your account setup.</p>
+              </div>
+              : 
+              ""
+            }
 
             <div className="flex justify-end">
               <button
