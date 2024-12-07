@@ -32,10 +32,13 @@ function App() {
   useEffect(() => {
     // Getting user's session through supabase, basically a cookie but not really
     const fetchSession = async () => {
-      const { data: { session } } = await supabase.auth.getSession();
-      setId(session.user.id);
-      setSession(session);
-      setLoading(false);
+      const { data: { session }, error } = await supabase.auth.getSession();
+      if (error) console.error(error)
+      if (session) {
+        setId(session.user.id);
+        setSession(session);
+        setLoading(false);
+      }
     };
 
     fetchSession();
@@ -52,6 +55,7 @@ function App() {
 
   useEffect(() => {
     const checkUser = async () => {
+      if (!id) return;
       const { data, error } = await supabase.from("Users").select().eq("user_id", id);
       if (error) console.error(error);
       if (data && data.length > 0) setUserExists(true);
