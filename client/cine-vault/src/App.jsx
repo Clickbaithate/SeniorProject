@@ -1,11 +1,9 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useReducer } from 'react';
 import supabase from './config/supabaseClient';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import SignUpPage from './pages/SignUpPage';
 import LandingPage from './pages/LandingPage';
 import HomePage from './pages/HomePage';
-//import Sidebar from './pages/Sidebar.jsx';
-import ProfileSetup from './pages/ProfileSetup';
 import EmailConfirmationPage from './pages/EmailConfirmationPage';
 import LoginPage from './pages/LoginPage';
 import DiscoverPage from './pages/DiscoverPage';
@@ -24,14 +22,18 @@ import UserProfile from './pages/UserProfile.jsx';
 import GenrePage from './pages/GenrePage.jsx';
 
 function App() {
+
   const [session, setSession] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [id, setId] = useState();
+  const [userExists, setUserExists] = useState(false);
 
   // When the website loads, we check if the user is logged in or not
   useEffect(() => {
     // Getting user's session through supabase, basically a cookie but not really
     const fetchSession = async () => {
       const { data: { session } } = await supabase.auth.getSession();
+      setId(session.user.id);
       setSession(session);
       setLoading(false);
     };
@@ -48,6 +50,15 @@ function App() {
     };
   }, []);
 
+  useEffect(() => {
+    const checkUser = async () => {
+      const { data, error } = await supabase.from("Users").select().eq("user_id", id);
+      if (error) console.error(error);
+      if (data && data.length > 0) setUserExists(true);
+    }
+    checkUser();
+  }, [id])
+
   // While we get user's session state...
   if (loading) return <div>Loading...</div>;
 
@@ -57,29 +68,26 @@ function App() {
     <Router>
       <Routes>
         <Route path="/" element={session ? <Navigate to="/homePage" /> : <LandingPage />} />
-
         <Route path="/signUp" element={session ? <Navigate to="/homePage" /> : <SignUpPage />} />
         <Route path="/login" element={session ? <Navigate to="/homePage" /> : <LoginPage />} />
-
-        <Route path="/homePage" element={session ? <HomePage /> : <Navigate to="/" />} />
-        <Route path="/profileSetup" element={session ? <ProfileSetup /> : <Navigate to="/" />} />
         <Route path="/emailConfirmationPage" element={session ? <HomePage /> : <EmailConfirmationPage />} />
-        <Route path="/friends" element={session ? <FriendsPage /> : <Navigate to="/" />} />
-        <Route path="/searchPage/:query" element={session ? <SearchPage /> : <Navigate to="/" />} />
 
-        <Route path="/movie/:id" element={session ? <MoviePage /> : <Navigate to="/" />} />
-        <Route path="/show/:id" element={session ? <ShowPage /> : <Navigate to="/" />} />
-        <Route path="/user/:id" element={session ? <UserProfile /> : <Navigate to="/" />} />
-        <Route path="/playlist/:id" element={session ? <Playlist /> : <Navigate to="/" />} />
-        <Route path="/discover" element={session ? <DiscoverPage /> : <Navigate to="/" />} />
+        <Route path="/homePage" element={session ? (userExists ? <HomePage /> : <Navigate to="/settings" />) : <Navigate to="/" />} />
+        <Route path="/friends" element={session ? (userExists ? <FriendsPage /> : <Navigate to="/settings" />) : <Navigate to="/" />} />
+        <Route path="/searchPage/:query" element={session ? (userExists ? <SearchPage /> : <Navigate to="/settings" />) : <Navigate to="/" />} />
+
+        <Route path="/movie/:id" element={session ? (userExists ? <MoviePage /> : <Navigate to="/settings" />) : <Navigate to="/" />} />
+        <Route path="/show/:id" element={session ? (userExists ? <ShowPage /> : <Navigate to="/settings" />) : <Navigate to="/" />} />
+        <Route path="/user/:id" element={session ? (userExists ? <UserProfile /> : <Navigate to="/settings" />) : <Navigate to="/" />} />
+        <Route path="/playlist/:id" element={session ? (userExists ? <Playlist /> : <Navigate to="/settings" />) : <Navigate to="/" />} />
+        <Route path="/discover" element={session ? (userExists ? <DiscoverPage /> : <Navigate to="/settings" />) : <Navigate to="/" />} />
         <Route path="/settings" element={session ? <SettingsPage /> : <Navigate to="/" />} />
-        <Route path="/genre/:genre" element={session ? <GenrePage /> : <Navigate to="/" />} />
+        <Route path="/genre/:genre" element={session ? (userExists ? <GenrePage /> : <Navigate to="/settings" />) : <Navigate to="/" />} />
 
-        <Route path="/challenges" element={session ? <ChallengesPage /> : <Navigate to="/" />} />
-        <Route path="/challenges/:id" element={session ? <Challenge /> : <Navigate to="/" />} />
-        <Route path="/playlists" element={session ? <PlaylistsPage /> : <Navigate to="/" />} />
-        <Route path="/categories" element={session ? <MovieCategories /> : <Navigate to="/" />} />
-        <Route path="/watched" element={session ? <WatchedPage /> : <Navigate to="/" />} />
+        <Route path="/challenges" element={session ? (userExists ? <ChallengesPage /> : <Navigate to="/settings" />) : <Navigate to="/" />} />
+        <Route path="/challenges/:id" element={session ? (userExists ? <Challenge /> : <Navigate to="/settings" />) : <Navigate to="/" />} />
+        <Route path="/playlists" element={session ? (userExists ? <PlaylistsPage /> : <Navigate to="/settings" />) : <Navigate to="/" />} />
+        <Route path="/watched" element={session ? (userExists ? <WatchedPage /> : <Navigate to="/settings" />) : <Navigate to="/" />} />
         <Route path="*" element={session ? <Navigate to="/homePage" /> : <Navigate to="/" />} />
       </Routes>
     </Router>
