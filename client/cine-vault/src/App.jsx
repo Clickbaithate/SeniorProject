@@ -58,13 +58,15 @@ function App() {
       if (!id) return;
       const { data, error } = await supabase.from("Users").select().eq("user_id", id);
       if (error) console.error(error);
-      if (data && data.length > 0) setUserExists(true);
+      else if (data && data.length > 0) setUserExists(true);
     }
     checkUser();
   }, [id])
 
   // While we get user's session state...
   if (loading) return <div>Loading...</div>;
+
+  console.log(userExists)
 
   // Establishing routes
   // If a user is not logged in, redirect them accordingly

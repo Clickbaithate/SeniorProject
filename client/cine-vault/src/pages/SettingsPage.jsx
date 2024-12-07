@@ -130,7 +130,7 @@ const SettingsPage = () => {
     try {
       const { data, error } = await supabase
         .from("Friends")
-        .select("relationship_id, user_id, friend_id, added")
+        .select("relationship_id, user_id, friend_id")
         .eq("friend_id", userId)
         .eq("status", "pending");
 
