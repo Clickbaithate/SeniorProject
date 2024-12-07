@@ -23,23 +23,36 @@ import GenrePage from './pages/GenrePage.jsx';
 
 function App() {
   const [session, setSession] = useState(null);
-  const [loading, setLoading] = useState(true);
-  const [id, setId] = useState();
+  const [id, setId] = useState(null);
   const [userExists, setUserExists] = useState(false);
-  const [userExistsLoading, setUserExistsLoading] = useState(true);
+  const [isAppReady, setIsAppReady] = useState(false);
 
   useEffect(() => {
-    const fetchSession = async () => {
-      const { data: { session }, error } = await supabase.auth.getSession();
-      if (error) console.error(error);
-      if (session) {
-        setId(session.user.id);
-        setSession(session);
+    const initializeApp = async () => {
+      try {
+        const { data: { session }, error } = await supabase.auth.getSession();
+        if (error) console.error(error);
+
+        if (session) {
+          setId(session.user.id);
+          setSession(session);
+
+          const { data, error: userError } = await supabase
+            .from("Users")
+            .select()
+            .eq("user_id", session.user.id);
+
+          if (userError) console.error(userError);
+          else setUserExists(data && data.length > 0);
+        }
+      } catch (error) {
+        console.error("Error initializing app:", error);
+      } finally {
+        setIsAppReady(true);
       }
     };
 
-    fetchSession();
-    setLoading(false);
+    initializeApp();
 
     const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
       setSession(session);
@@ -50,37 +63,21 @@ function App() {
     };
   }, []);
 
-  useEffect(() => {
-    const checkUser = async () => {
-      if (!id) {
-        setUserExistsLoading(false);
-        return;
-      }
-      const { data, error } = await supabase.from("Users").select().eq("user_id", id);
-      if (error) {
-        console.error(error);
-      } else {
-        setUserExists(data && data.length > 0);
-      }
-      setUserExistsLoading(false);
-    };
-    checkUser();
-  }, [id]);
-
-  if (loading || userExistsLoading) return <div>Loading...</div>;
+  if (!isAppReady) return <div>Loading...</div>;
 
   return (
     <Router>
       <Routes>
+        {/* Public Routes */}
         <Route path="/" element={session ? <Navigate to="/homePage" /> : <LandingPage />} />
         <Route path="/signUp" element={session ? <Navigate to="/homePage" /> : <SignUpPage />} />
         <Route path="/login" element={session ? <Navigate to="/homePage" /> : <LoginPage />} />
         <Route path="/emailConfirmationPage" element={session ? <HomePage /> : <EmailConfirmationPage />} />
 
+        {/* Authenticated Routes */}
         <Route path="/homePage" element={session ? (userExists ? <HomePage /> : <Navigate to="/settings" />) : <Navigate to="/" />} />
         <Route path="/friends" element={session ? (userExists ? <FriendsPage /> : <Navigate to="/settings" />) : <Navigate to="/" />} />
         <Route path="/searchPage/:query" element={session ? (userExists ? <SearchPage /> : <Navigate to="/settings" />) : <Navigate to="/" />} />
-
         <Route path="/movie/:id" element={session ? (userExists ? <MoviePage /> : <Navigate to="/settings" />) : <Navigate to="/" />} />
         <Route path="/show/:id" element={session ? (userExists ? <ShowPage /> : <Navigate to="/settings" />) : <Navigate to="/" />} />
         <Route path="/user/:id" element={session ? (userExists ? <UserProfile /> : <Navigate to="/settings" />) : <Navigate to="/" />} />
@@ -88,11 +85,12 @@ function App() {
         <Route path="/discover" element={session ? (userExists ? <DiscoverPage /> : <Navigate to="/settings" />) : <Navigate to="/" />} />
         <Route path="/settings" element={session ? <SettingsPage /> : <Navigate to="/" />} />
         <Route path="/genre/:genre" element={session ? (userExists ? <GenrePage /> : <Navigate to="/settings" />) : <Navigate to="/" />} />
-
         <Route path="/challenges" element={session ? (userExists ? <ChallengesPage /> : <Navigate to="/settings" />) : <Navigate to="/" />} />
         <Route path="/challenges/:id" element={session ? (userExists ? <Challenge /> : <Navigate to="/settings" />) : <Navigate to="/" />} />
         <Route path="/playlists" element={session ? (userExists ? <PlaylistsPage /> : <Navigate to="/settings" />) : <Navigate to="/" />} />
         <Route path="/watched" element={session ? (userExists ? <WatchedPage /> : <Navigate to="/settings" />) : <Navigate to="/" />} />
+
+        {/* Redirect if route doesn't exist */}
         <Route path="*" element={session ? <Navigate to="/homePage" /> : <Navigate to="/" />} />
       </Routes>
     </Router>
