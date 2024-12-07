@@ -26,7 +26,7 @@ const SignUpPage = () => {
       const { error } = await supabase.auth.signUp({ email, password });
       if (error) throw error;
       setMessage('Sign-up successful! Please check your email for confirmation.');
-      navigate('/emailConfirmationPage');
+      navigate(`/emailConfirmationPage?email=${email}`);
     } catch (error) {
       setError(`Error: ${error.message}`);
     }
