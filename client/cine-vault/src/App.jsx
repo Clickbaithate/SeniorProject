@@ -52,6 +52,7 @@ function App() {
 
   useEffect(() => {
     const checkUser = async () => {
+      if (!id) return;
       const { data, error } = await supabase.from("Users").select().eq("user_id", id);
       if (error) console.error(error);
       if (data && data.length > 0) setUserExists(true);
