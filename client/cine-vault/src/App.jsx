@@ -36,6 +36,7 @@ function App() {
         if (session) {
           setId(session.user.id);
           setSession(session);
+          setUserExists(true);
 
           const { data, error: userError } = await supabase
             .from("Users")
