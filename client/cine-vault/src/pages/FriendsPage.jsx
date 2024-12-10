@@ -104,24 +104,25 @@ const FriendsPage = () => {
     fetchProfile();
   }, []);
 
-  useEffect(() => {
-    socket.on("receiveMessage", (message) => {
-      if (!processedMessageIds.has(message.id)) {
-        processedMessageIds.add(message.id);
+useEffect(() => {
+  if (!user) return;
 
-        if (
-          (message.sender_id === user.user_id && message.receiver_id === activeChat) ||
-          (message.sender_id === activeChat && message.receiver_id === user.user_id)
-        ) {
-          setMessages((prevMessages) => {
-            return prevMessages.filter((msg) => msg.id !== message.id).concat(message);
-          });
-        }
-      }
-    });
+  const handleReceiveMessage = (message) => {
+    if (
+      (message.sender_id === user.user_id && message.receiver_id === activeChat) ||
+      (message.sender_id === activeChat && message.receiver_id === user.user_id)
+    ) {
+      setMessages((prev) => [...prev, message]);
+    }
+  };
 
-    return () => socket.off("receiveMessage");
-  }, [activeChat, user]);
+  socket.on("receiveMessage", handleReceiveMessage);
+
+  return () => {
+    socket.off("receiveMessage", handleReceiveMessage);
+  };
+}, [user, activeChat]);
+
 
 
   const sendMessage = () => {
@@ -136,7 +137,6 @@ const FriendsPage = () => {
       timestamp: new Date().toISOString(),
     };
 
-    setMessages((prevMessages) => [...prevMessages, { ...message, isOutgoing: true }]);
 
     socket.emit("sendMessage", message);
 

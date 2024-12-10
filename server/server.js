@@ -15,7 +15,11 @@ const app = express();
 const server = http.createServer(app);
 const port = process.env.PORT || 4000;
 
-const allowedOrigins = ["https://www.cinevault.xyz", "http://localhost:3000", "http://localhost:5173"];
+const allowedOrigins = [
+  "https://www.cinevault.xyz",
+  "http://localhost:3000",
+  "http://localhost:5173"
+];
 
 app.use(
   cors({
@@ -59,7 +63,7 @@ io.on("connection", (socket) => {
 
       const { data: senderMessages, error: senderFetchError } = await supabase
         .from("Messages")
-        .select("id, timestamp")
+        .select("message_id, timestamp")
         .eq("sender_id", message.sender_id)
         .eq("receiver_id", message.receiver_id)
         .order("timestamp", { ascending: true });
@@ -70,20 +74,21 @@ io.on("connection", (socket) => {
       }
 
       if (senderMessages.length > 10) {
-        const oldestSenderMessageId = senderMessages[0].id;
+        const oldestSenderMessageId = senderMessages[0].message_id; // Use message_id here
         const { error: senderDeleteError } = await supabase
           .from("Messages")
           .delete()
-          .eq("id", oldestSenderMessageId);
+          .eq("message_id", oldestSenderMessageId);
 
         if (senderDeleteError) {
           console.error("Error deleting sender's oldest message:", senderDeleteError);
         }
       }
 
+      // Fetch receiver's messages in this conversation
       const { data: receiverMessages, error: receiverFetchError } = await supabase
         .from("Messages")
-        .select("id, timestamp")
+        .select("message_id, timestamp")
         .eq("sender_id", message.receiver_id)
         .eq("receiver_id", message.sender_id)
         .order("timestamp", { ascending: true });
@@ -94,11 +99,11 @@ io.on("connection", (socket) => {
       }
 
       if (receiverMessages.length > 10) {
-        const oldestReceiverMessageId = receiverMessages[0].id;
+        const oldestReceiverMessageId = receiverMessages[0].message_id; // Use message_id here
         const { error: receiverDeleteError } = await supabase
           .from("Messages")
           .delete()
-          .eq("id", oldestReceiverMessageId);
+          .eq("message_id", oldestReceiverMessageId);
 
         if (receiverDeleteError) {
           console.error("Error deleting receiver's oldest message:", receiverDeleteError);
@@ -122,4 +127,5 @@ app.get("/", (req, res) => {
 
 server.listen(port, () => {
   console.log(`Server is running on port ${port}`);
+
 });
