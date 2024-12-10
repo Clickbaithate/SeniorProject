@@ -43,7 +43,7 @@ function App() {
             .eq("user_id", session.user.id);
 
           if (userError) console.error(userError);
-          else setUserExists(data && data.length > 0);
+          else setUserExists(true);
         }
       } catch (error) {
         console.error("Error initializing app:", error);
