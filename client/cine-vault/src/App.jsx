@@ -76,7 +76,7 @@ function App() {
         {/* Public Routes */}
         <Route path="/" element={session ? <Navigate to="/homePage" /> : <LandingPage />} />
         <Route path="/signUp" element={session ? <Navigate to="/homePage" /> : <SignUpPage />} />
-        <Route path="/login" element={session ? <Navigate to="/homePage" /> : <LoginPage />} />
+        <Route path="/login" element={session ? <Navigate to="/homePage" /> : <LoginPage onProfileComplete={handleProfileCompletion} />} />
         <Route path="/emailConfirmationPage" element={session ? <HomePage /> : <EmailConfirmationPage />} />
 
         {/* Authenticated Routes */}
