@@ -2,7 +2,7 @@ import supabase from '../config/supabaseClient';
 import { useNavigate } from 'react-router-dom';
 import { useState, useEffect } from 'react';
 
-const LoginPage = () => {
+const LoginPage = ({ onProfileComplete }) => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState(null);
@@ -32,6 +32,7 @@ const LoginPage = () => {
       if (data.user && !data.user.email_confirmed_at) {
         navigate('/emailConfirmationPage');
       } else {
+        onProfileComplete();
         navigate('/homePage');
       }
     } catch (error) {
