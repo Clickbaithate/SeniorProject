@@ -40,7 +40,12 @@ const MovieChallengeCard = ({ movie, index }) => {
       </div>
 
       {/* Eye Icon */}
-      <FontAwesomeIcon className="w-8 h-8 mr-12"  icon={faEye} />
+      <FontAwesomeIcon
+        className={`w-8 h-8 mr-12 ${
+          movie.watched ? "text-green-500" : "text-gray-500"
+        }`}
+        icon={faEye}
+      />
     </div>
   );
 }

@@ -5,20 +5,18 @@ import "./theme.css";
 import MovieChallengeCard from "../components/ChallengeMovieCard";
 
 const Challenge = () => {
-  const { id } = useParams(); // Challenge ID from the URL
+  const { id } = useParams(); 
   const navigate = useNavigate();
-  const [challenge, setChallenge] = useState(null); // Current challenge details
-  const [movies, setMovies] = useState(null); // Movies in the challenge
-  const [userId, setUserId] = useState(null); // User ID from session
+  const [challenge, setChallenge] = useState(null);
+  const [movies, setMovies] = useState(null);
+  const [userId, setUserId] = useState(null);
 
-  // Apply the theme based on stored preference
   const applyTheme = (theme) => {
     document.documentElement.setAttribute("data-theme", theme);
   };
 
   const toggleWatchedStatus = async (movieId) => {
     try {
-      // Check if the movie is already marked as watched
       const { data, error } = await supabase
         .from("Watched_Movies")
         .select("*")
@@ -30,36 +28,27 @@ const Challenge = () => {
       }
 
       if (data.length > 0) {
-        // If already watched, remove it
         await supabase
           .from("Watched_Movies")
           .delete()
           .match({ user_id: userId, movie_id: movieId });
       } else {
-        // Mark the movie as watched
         await supabase
           .from("Watched_Movies")
           .insert({ user_id: userId, movie_id: movieId });
       }
 
-      // Refresh challenge details
       await fetchChallengeDetails();
     } catch (error) {
       console.error("Error toggling watched status:", error);
     }
   };
 
-  // Retrieve theme and user session on component mount
   useEffect(() => {
     const fetchSessionAndTheme = async () => {
       const storedTheme = localStorage.getItem("theme");
-      if (storedTheme) {
-        applyTheme(storedTheme);
-      } else {
-        applyTheme("light");
-      }
+      applyTheme(storedTheme || "light");
 
-      // Fetch user session
       const {
         data: { session },
         error,
@@ -68,16 +57,14 @@ const Challenge = () => {
         console.warn("Error fetching session:", error);
         return;
       }
-      setUserId(session.user.id); // Set the user ID
+      setUserId(session.user.id);
     };
 
     fetchSessionAndTheme();
   }, []);
 
-  // Fetch challenge details and recalculate percent
   const fetchChallengeDetails = async () => {
     try {
-      // Fetch the challenge data
       const { data: challengeData, error: challengeError } = await supabase
         .from("Challenges")
         .select("*")
@@ -94,7 +81,6 @@ const Challenge = () => {
         return;
       }
 
-      // Fetch watched movies in this challenge
       const { data: watchedMovies, error: watchedError } = await supabase
         .from("Watched_Movies")
         .select("movie_id")
@@ -106,81 +92,78 @@ const Challenge = () => {
         return;
       }
 
-      // Calculate progress
       const progress = Math.min(
         Math.round((watchedMovies.length / challengeData.media.length) * 100),
         100
       );
 
-      // Update the challenge data with the new percent
       setChallenge({
         ...challengeData,
         percent: progress,
       });
 
-      // Optionally, update the percent in the database
-      const { error: updateError } = await supabase
+      await supabase
         .from("Challenges")
         .update({ percent: progress })
         .eq("challenge_id", challengeData.challenge_id);
-
-      if (updateError) {
-        console.error("Error updating challenge progress:", updateError);
-      }
     } catch (error) {
       console.error("Error fetching challenge details:", error);
     }
   };
 
-  // Fetch challenge details when the component mounts or userId changes
   useEffect(() => {
     if (userId) {
       fetchChallengeDetails();
     }
   }, [id, userId]);
 
-  // Fetch movies for the challenge when the challenge data changes
-  useEffect(() => {
-    const fetchMovies = async () => {
-      if (challenge && challenge.media && challenge.media.length > 0) {
-        const { data, error } = await supabase
-          .from("Movies")
-          .select("*")
-          .in("movie_id", challenge.media);
+  const fetchMovies = async () => {
+    if (challenge?.media?.length > 0) {
+      const { data, error } = await supabase
+        .from("Movies")
+        .select("*")
+        .in("movie_id", challenge.media);
 
-        if (error) {
-          console.error("Error fetching movies:", error);
-          return;
-        }
-
-        setMovies(data);
+      if (error) {
+        console.error("Error fetching movies:", error);
+        return;
       }
-    };
 
-    fetchMovies();
+      const { data: watchedMovies, error: watchedError } = await supabase
+        .from("Watched_Movies")
+        .select("movie_id")
+        .eq("user_id", userId);
+
+      if (watchedError) {
+        console.error("Error fetching watched movies:", watchedError);
+        return;
+      }
+
+      const moviesWithWatchedStatus = data.map((movie) => ({
+        ...movie,
+        watched: watchedMovies.some(
+          (watchedMovie) => watchedMovie.movie_id === movie.movie_id
+        ),
+      }));
+
+      setMovies(moviesWithWatchedStatus);
+    }
+  };
+
+  useEffect(() => {
+    if (challenge) {
+      fetchMovies();
+    }
   }, [challenge]);
 
-  // Refetch challenge details when the window regains focus
-  useEffect(() => {
-    const handleFocus = () => {
-      if (userId) {
-        fetchChallengeDetails();
-      }
-    };
-
-    window.addEventListener("focus", handleFocus);
-    return () => window.removeEventListener("focus", handleFocus);
-  }, [userId]);
-
   const onBack = () => {
-    navigate(-1); // Navigate back to the previous page
+    navigate(-1);
   };
 
   return (
     <div className="bg-theme">
       {challenge ? (
         <div>
-          {/* Challenge Title */}
           <div className="flex justify-between px-16 pt-12 pb-6 text-theme text-4xl font-body">
             <div>{challenge.title}</div>
             <button
@@ -191,14 +174,12 @@ const Challenge = () => {
             </button>
           </div>
 
-          {/* Challenge Progress */}
           <div className="ml-16 font-body pt-6 pb-10">
             You have watched{" "}
             <span className="text-red-500">{challenge.percent || 0}%</span> of
             this challenge!
           </div>
 
-          {/* Movies in the Challenge */}
           <div className="flex flex-col items-center ml-96 space-y-6">
             {movies ? (
               movies.map((movie, i) => (
@@ -215,7 +196,6 @@ const Challenge = () => {
               <p>Loading movies...</p>
             )}
           </div>
-
           <div className="h-12" />
         </div>
       ) : (
