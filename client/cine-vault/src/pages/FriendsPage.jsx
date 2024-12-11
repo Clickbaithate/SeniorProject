@@ -195,16 +195,25 @@ useEffect(() => {
       <div className="flex-1 flex flex-col ">
         {/* Chat Header */}
         <header className={`accent p-4 flex items-center`}>
-          <div className="w-10 h-10 rounded-full overflow-hidden mr-3">
-            <img
-              src={friends.find((friend) => friend.user_id === activeChat)?.profile_picture || ''}
-              alt="Friend's Avatar"
-              className="w-full h-full object-cover"
-            />
-          </div>
-          <h1 className={`text-2xl font-semibold`}>
-            {friends.find((friend) => friend.user_id === activeChat)?.username || 'Select a friend'}
-          </h1>
+          {activeChat ? (
+            <>
+              <div className="w-10 h-10 rounded-full overflow-hidden mr-3">
+                <img
+                  src={
+                    friends.find((friend) => friend.user_id === activeChat)?.profile_picture ||
+                    ''
+                  }
+                  alt="Friend's Avatar"
+                  className="w-full h-full object-cover"
+                />
+              </div>
+              <h1 className={`text-2xl font-semibold`}>
+                {friends.find((friend) => friend.user_id === activeChat)?.username || 'Friend'}
+              </h1>
+            </>
+          ) : (
+            <h1 className={`text-2xl font-semibold text-center w-full`}>Select a friend</h1>
+          )}
         </header>
 
         {/* Chat Messages */}
@@ -236,7 +245,7 @@ useEffect(() => {
                 )}
                 <div
                   className={`accent p-2 rounded-lg max-w-96 ${
-                    msg.sender_id === user.user_id ? 'bg-[rgb(0,120,254)] text-white' : 'bg-gray-200'
+                    msg.sender_id === user.user_id ? 'bg-[rgb(0,120,254)] text-white' : 'bg-gray-200 text-black'
                   }`}
                 >
                   {msg.message_body}
