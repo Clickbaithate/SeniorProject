@@ -97,7 +97,7 @@ const ChallengesPage = () => {
               </button>
               <input
                 type="text"
-                placeholder="Search your playlists..."
+                placeholder="Search your challenges..."
                 className={`w-full focus:outline-none bg-transparent font-body `}
                 value={searchText}
                 onChange={(e) => setSearchText(e.target.value)}
